@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blueprint de Contactabilidad en Red</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Diseño: matriz de carriles (filas) por etapas (columnas), ficha lateral y panel de brechas.
+   Paleta fría e institucional; el color codifica tipo de fuente, estado y gravedad. */
+:root{
+  --bg:#f2f5f6; --surface:#ffffff; --surface2:#e8eef0; --ink:#17262c; --muted:#54676f; --line:#d1dcdf;
+  --accent:#0d6a73; --accent-soft:#d9eef0;
+  --t-norma:#3a4fa3; --t-practica:#0d6a73; --t-propuesta:#9c3f8a;
+  --e-existe:#2b7a4b; --e-noexiste:#b83a2e; --e-nosabe:#6b7a80; --e-propuesta:#2f63ae;
+  --g-fortaleza:#2b7a4b; --g-preventivo:#a96d0a; --g-continuidad:#b83a2e; --g-aclarar:#2f63ae;
+  --l-actor:#5d6b73; --l-regla:#46607a; --l-dato:#b4573a;
+  --shadow:0 10px 36px rgba(10,30,40,.22);
+  --font:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#10191d; --surface:#17242a; --surface2:#1f3037; --ink:#e3edf0; --muted:#9db0b7; --line:#2d424a;
+    --accent:#4fc1ca; --accent-soft:#183c41;
+    --t-norma:#8e9fe8; --t-practica:#4fc1ca; --t-propuesta:#e08ccf;
+    --e-existe:#5fc088; --e-noexiste:#f07b6e; --e-nosabe:#93a5ab; --e-propuesta:#7fb0f0;
+    --g-fortaleza:#5fc088; --g-preventivo:#e5b04e; --g-continuidad:#f07b6e; --g-aclarar:#7fb0f0;
+    --l-actor:#8da0a8; --l-regla:#7ea0c4; --l-dato:#e08a6c;
+    --shadow:0 10px 36px rgba(0,0,0,.55);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10191d; --surface:#17242a; --surface2:#1f3037; --ink:#e3edf0; --muted:#9db0b7; --line:#2d424a;
+  --accent:#4fc1ca; --accent-soft:#183c41;
+  --t-norma:#8e9fe8; --t-practica:#4fc1ca; --t-propuesta:#e08ccf;
+  --e-existe:#5fc088; --e-noexiste:#f07b6e; --e-nosabe:#93a5ab; --e-propuesta:#7fb0f0;
+  --g-fortaleza:#5fc088; --g-preventivo:#e5b04e; --g-continuidad:#f07b6e; --g-aclarar:#7fb0f0;
+  --l-actor:#8da0a8; --l-regla:#7ea0c4; --l-dato:#e08a6c;
+  --shadow:0 10px 36px rgba(0,0,0,.55);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.45}
+h1,h2,h3{text-wrap:balance;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1500px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:20px}
+header.top{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.02em}
+h1{font-size:26px;font-weight:600}
+.lead{max-width:78ch;color:var(--muted)}
+.warn{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--g-preventivo);padding:10px 14px;border-radius:6px;max-width:100ch}
+.warn b{font-weight:600}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.tile h3{font-size:12px;font-weight:500;color:var(--muted)}
+.tile .big{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--surface2)}
+.bar i{display:block;height:100%}
+.tile .sub{font-size:12px;color:var(--muted)}
+
+section.block{display:flex;flex-direction:column;gap:10px}
+section.block>h2{font-size:18px;font-weight:600}
+section.block>p.note{margin:0;color:var(--muted);max-width:90ch}
+
+.routes{display:flex;flex-direction:column;gap:16px}
+.route{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px}
+.route h3{font-size:14px;font-weight:600;margin-bottom:2px}
+.route .rn{font-size:12px;color:var(--muted);margin-bottom:10px}
+.steps{display:flex;gap:0;overflow-x:auto;padding-bottom:6px;align-items:stretch}
+.step{flex:0 0 205px;display:flex;align-items:stretch}
+.step .card{flex:1;background:var(--bg);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:4px}
+.step.to .card{border-top-color:var(--t-propuesta);border-style:solid dashed dashed dashed}
+.step .n{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.step .who{font-weight:600;font-size:13px}
+.step .what{font-size:13px}
+.step .gap{font-size:12px;color:var(--g-preventivo);margin-top:auto;padding-top:4px}
+.arrow{flex:0 0 22px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld label{font-size:12px;color:var(--muted)}
+select,input[type=search]{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;min-height:34px}
+input[type=search]{min-width:220px}
+.chk{display:flex;align-items:center;gap:6px;min-height:34px}
+.btn{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer;min-height:34px}
+.btn:hover{border-color:var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--muted);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+
+.matrixbox{border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:auto;max-height:78vh}
+.matrix{display:grid;grid-template-columns:210px repeat(9,minmax(226px,1fr));min-width:2250px}
+.corner,.colh{position:sticky;top:0;z-index:3;background:var(--surface2);border-bottom:1px solid var(--line);padding:8px 10px}
+.corner{left:0;top:0;z-index:5;display:flex;align-items:flex-end;font-size:12px;color:var(--muted)}
+.colh{border-left:1px solid var(--line);top:34px}
+.phh{position:sticky;top:0;z-index:4;height:34px;background:var(--surface2);border-left:1px solid var(--line);border-bottom:1px solid var(--line);border-top:4px solid var(--pc);padding:3px 10px;font-size:12px;display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap}
+.phh b{font-family:var(--mono);color:var(--pc)}
+.corner{grid-row:span 2}
+.journey{display:flex;gap:0;overflow-x:auto;padding-bottom:8px;align-items:stretch}
+.jstep{flex:0 0 230px;display:flex;align-items:stretch}
+.jstep .card{flex:1;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--pc);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:5px;font-size:12.5px}
+.jstep .jc{font-family:var(--mono);font-size:11px;color:var(--pc)}
+.jstep .jt{font-weight:600;font-size:13px}
+.jstep .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.jstep .lk{align-self:flex-start;margin-top:auto}
+.cycle{background:var(--surface);border:1px dashed var(--t-propuesta);border-radius:8px;padding:10px 12px;font-size:13px}
+.colh .tc{font-family:var(--mono);font-size:11px;color:var(--accent)}
+.colh .tt{font-weight:600;font-size:13px}
+.colh .ts{font-size:11.5px;color:var(--muted)}
+.layer{grid-column:1/-1;background:var(--surface2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);height:30px;position:relative}
+.layer span{position:sticky;left:12px;display:inline-flex;align-items:center;gap:8px;height:100%;font-size:12px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;padding:0 0}
+.layer span:before{content:"";width:10px;height:10px;border-radius:2px;background:var(--lc)}
+.rowh{position:sticky;left:0;z-index:2;background:var(--surface);border-bottom:1px solid var(--line);border-left:5px solid var(--lc);padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.rowh .rt{font-weight:600;font-size:13px}
+.rowh .rs{font-size:12px;color:var(--muted)}
+.flag{align-self:flex-start;margin-top:4px;font-size:11px;padding:1px 6px;border-radius:10px;border:1px solid var(--g-preventivo);color:var(--g-preventivo)}
+.slot{border-left:1px solid var(--line);border-bottom:1px solid var(--line);padding:6px;display:flex;flex-direction:column;gap:6px;min-height:64px}
+.cell{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:6px;background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--tc);border-radius:5px;padding:7px 8px;font-size:12.5px;line-height:1.4}
+.cell:hover{border-color:var(--accent);border-left-color:var(--tc)}
+.cell:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.cell.hl{outline:3px solid var(--accent);outline-offset:1px}
+.cell.dim{display:none}
+.cell .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{font-size:10.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--tc)}
+.badge{font-size:11px;padding:1px 7px;border-radius:10px;border:1.5px solid var(--ec);color:var(--ec);background:transparent;white-space:nowrap}
+.badge.existe{background:var(--ec);color:var(--surface)}
+.badge.noexiste{background:var(--ec);color:var(--surface)}
+.badge.nosabe{border-style:dotted}
+.badge.propuesta{border-style:dashed}
+.gdots{display:inline-flex;gap:3px;margin-left:auto}
+.gdots i{width:9px;height:9px;border-radius:50%;background:var(--gc)}
+.cell.t-N{--tc:var(--t-norma)} .cell.t-P{--tc:var(--t-practica)} .cell.t-X{--tc:var(--t-propuesta)}
+.e-E{--ec:var(--e-existe)} .e-R{--ec:var(--e-noexiste)} .e-D{--ec:var(--e-nosabe)} .e-Q{--ec:var(--e-propuesta)}
+.empty{grid-column:1/-1;padding:24px;text-align:center;color:var(--muted)}
+
+.gaps{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px}
+.gap-card{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--gc);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.gap-card .gh{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.gap-card .gs{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;color:var(--gc)}
+.gap-card .gid{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.gap-card h3{font-size:14px;font-weight:600}
+.gap-card p{margin:0;font-size:13px}
+.gap-card .links{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+.lk{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:2px 9px;font-size:11.5px;cursor:pointer}
+.lk:hover{border-color:var(--accent)}
+.src{font-size:11.5px;color:var(--muted)}
+
+ol.decs{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:8px;counter-reset:d}
+ol.decs li{counter-increment:d;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px 8px 40px;position:relative}
+ol.decs li:before{content:counter(d);position:absolute;left:10px;top:8px;font-family:var(--mono);font-size:12px;color:var(--accent)}
+.srcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:6px 20px;font-size:12.5px}
+.srcs div b{font-family:var(--mono);font-weight:500;color:var(--accent);margin-right:6px}
+footer{color:var(--muted);font-size:12.5px;max-width:100ch;border-top:1px solid var(--line);padding-top:12px}
+
+aside#ficha{position:fixed;top:0;right:0;height:100%;width:min(440px,100%);background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow);z-index:20;transform:translateX(105%);transition:transform .18s ease;display:flex;flex-direction:column}
+aside#ficha.open{transform:none}
+@media (prefers-reduced-motion:reduce){aside#ficha{transition:none}}
+#ficha .fh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+#ficha .fh h2{font-size:15px;font-weight:600}
+#ficha .fh .x{background:none;border:1px solid var(--line);border-radius:6px;width:32px;height:32px;cursor:pointer;flex:none}
+#ficha .fb{padding:14px 16px 24px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+#ficha .k{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+#ficha .v{font-size:13.5px}
+#ficha .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#ficha .dl{border-left:3px solid var(--line);padding-left:10px}
+#ficha .fgap{border:1px solid var(--line);border-left:4px solid var(--gc);border-radius:6px;padding:8px 10px}
+#ficha .fgap b{font-weight:600}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:15;display:none}
+.scrim.on{display:block}
+
+@media (max-width:600px){h1{font-size:22px}}
+@media print{aside#ficha,.toolbar,.scrim{display:none}.matrixbox{max-height:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">Servicio de Salud del Reloncaví · Hospital Puerto Montt · Blueprint V0.2</div>
+  <h1>Blueprint de Contactabilidad en Red</h1>
+  <p class="lead">El proceso de contactabilidad visto como trayectoria de la persona: desde su centro de origen hasta la continuidad del cuidado después de la primera consulta de especialidad, repartido por carriles de responsabilidad. Cada celda dice de dónde viene (norma, práctica actual o propuesta) y si existe hoy. El escalamiento de la no contactabilidad se organiza por pares de referentes: uno territorial en el HPM y su contraparte en cada establecimiento.</p>
+  <div class="warn"><b>Documento de trabajo para validar con la mesa.</b> No es un procedimiento aprobado por la red. Donde dice «Norma» es lo que fija la Orientación Técnica del MINSAL. «Práctica» es lo que hoy describen el Manual HPM, el flujo HPM–SSDR, el Acta y los protocolos de Navegadores. «Propuesta» es nuevo y se discute. Las celdas con «No sabemos» son las que hay que marcar en la mesa.</div>
+</header>
+
+<div class="tiles" id="tiles" aria-label="Resumen"></div>
+
+<section class="block">
+  <h2>Cómo se escala hoy una persona no contactable, y cómo podría escalarse</h2>
+  <p class="note">Arriba, la ruta que describe el flujo HPM–SSDR. Abajo, la propuesta: replicar en toda la red el trabajo por referentes de la UGT, con una contraparte designada en cada establecimiento. Los pasos van de menor a mayor costo, como pide la OT.</p>
+  <div class="routes" id="routes"></div>
+</section>
+
+<section class="block" id="trayectoria-sec">
+  <h2>La trayectoria vista desde la persona</h2>
+  <p class="note">La mesa tiende a mirar el hito puntual del no contacto. Aquí está el recorrido completo, de inicio a fin. Las fases O y P son las que se agregan a la contactabilidad clásica: el origen antes de la derivación y la continuidad después de la consulta nueva de especialidad (CNE). Si la mesa decide partir más adelante, se acota con el selector y esos tramos se omiten.</p>
+  <div class="toolbar">
+    <div class="fld"><label for="f-scope">Alcance del proceso</label>
+      <select id="f-scope"><option value="full">Trayectoria completa: origen a continuidad</option><option value="deriv">Desde la derivación hasta la continuidad</option><option value="hosp">Solo hospital de especialidad y post atención</option><option value="nc">Solo gestión de la no contactabilidad</option></select></div>
+  </div>
+  <div class="journey" id="journey"></div>
+  <div class="cycle"><b>Es un ciclo, no una línea.</b> Cada nueva prestación (control, examen, otra especialidad) vuelve a entrar desde la indicación y la derivación. La no contactabilidad puede activarse desde la vinculación hasta la citación y la confirmación (OT §5.1). Después de la atención, si no hay contacto, se cierra el proceso de contactabilidad (OT §5.5), pero eso no equivale a que el cuidado haya terminado. El proceso en el origen es una hipótesis a levantar con APS: la OT no lo cubre.</div>
+</section>
+
+<section class="block" id="matriz-sec">
+  <h2>Matriz por carriles y etapas</h2>
+  <div class="toolbar">
+    <div class="fld"><label for="f-tipo">Origen</label>
+      <select id="f-tipo"><option value="todos">Todos</option><option value="N">Norma</option><option value="P">Práctica actual</option><option value="X">Propuesta</option></select></div>
+    <div class="fld"><label for="f-est">¿Existe hoy?</label>
+      <select id="f-est"><option value="todos">Todos los estados</option><option value="E">Existe</option><option value="R">No existe</option><option value="D">No sabemos</option><option value="Q">Es una propuesta</option></select></div>
+    <div class="fld"><label for="f-q">Buscar</label><input id="f-q" type="search" placeholder="Palabra clave"></div>
+    <label class="chk"><input id="f-g" type="checkbox"> Solo celdas con brechas</label>
+    <button class="btn" id="f-clear" type="button">Limpiar</button>
+  </div>
+  <div class="legend" aria-label="Leyenda">
+    <span><i style="width:12px;height:12px;border-left:4px solid var(--t-norma);display:inline-block"></i> Norma</span>
+    <span><i style="width:12px;height:12px;border-left:4px solid var(--t-practica);display:inline-block"></i> Práctica actual</span>
+    <span><i style="width:12px;height:12px;border-left:4px solid var(--t-propuesta);display:inline-block"></i> Propuesta</span>
+    <span class="e-E"><span class="badge existe">Existe</span></span>
+    <span class="e-R"><span class="badge noexiste">No existe</span></span>
+    <span class="e-D"><span class="badge nosabe">No sabemos</span></span>
+    <span class="e-Q"><span class="badge propuesta">Es una propuesta</span></span>
+    <span><i class="dot" style="width:9px;height:9px;border-radius:50%;background:var(--g-fortaleza);display:inline-block"></i> Fortaleza</span>
+    <span><i style="width:9px;height:9px;border-radius:50%;background:var(--g-preventivo);display:inline-block"></i> Preventivo</span>
+    <span><i style="width:9px;height:9px;border-radius:50%;background:var(--g-continuidad);display:inline-block"></i> Riesgo de continuidad</span>
+    <span><i style="width:9px;height:9px;border-radius:50%;background:var(--g-aclarar);display:inline-block"></i> Por aclarar</span>
+  </div>
+  <div class="matrixbox" tabindex="0" aria-label="Matriz de carriles por etapas, desplazable"><div class="matrix" id="matrix"></div></div>
+</section>
+
+<section class="block" id="brechas-sec">
+  <h2>Brechas y alertas</h2>
+  <div class="toolbar">
+    <div class="fld"><label for="g-sort">Ordenar por</label>
+      <select id="g-sort"><option value="sev">Gravedad</option><option value="etapa">Etapa del proceso</option><option value="actor">Carril</option></select></div>
+  </div>
+  <div class="gaps" id="gaps"></div>
+</section>
+
+<section class="block">
+  <h2>Decisiones que debe tomar la mesa</h2>
+  <ol class="decs" id="decs"></ol>
+</section>
+
+<section class="block">
+  <h2>Fuentes</h2>
+  <div class="srcs" id="srcs"></div>
+</section>
+
+<footer>Documento de trabajo interno, sin carácter normativo oficial. Los plazos y números de intentos marcados como «Norma» corresponden al texto de la Orientación Técnica; deben contrastarse con la versión vigente y con la normativa GES antes de usarse en un procedimiento. La búsqueda ampliada de datos y los medios comunitarios exigen resguardo de confidencialidad según la OT.</footer>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside id="ficha" role="dialog" aria-modal="false" aria-labelledby="ficha-t" aria-hidden="true">
+  <div class="fh"><div><div class="k" id="ficha-k">Ficha operacional</div><h2 id="ficha-t"></h2></div><button class="x" id="ficha-x" type="button" aria-label="Cerrar ficha">✕</button></div>
+  <div class="fb" id="ficha-b"></div>
+</aside>
+
+<script>
+"use strict";
+/* ============ DATOS ============ */
+var TIPO={N:"Norma",P:"Práctica actual",X:"Propuesta"};
+var EST={E:"Existe",R:"No existe",D:"No sabemos",Q:"Es una propuesta"};
+var ESTCLS={E:"existe",R:"noexiste",D:"nosabe",Q:"propuesta"};
+var SEV={fortaleza:"Fortaleza",preventivo:"Preventivo",continuidad:"Riesgo de continuidad",aclarar:"Por aclarar"};
+var SEVORD={continuidad:0,preventivo:1,aclarar:2,fortaleza:3};
+
+var SRC={
+  OT:"Orientación Técnica MINSAL para la gestión de la contactabilidad (mediana y alta complejidad)",
+  MAN:"Manual de Contactabilidad de Atención Ambulatoria HPM, CCP 01, aprobado por Res. J1907 del 20-05-2026",
+  FLU:"Flujo de contactabilidad HPM–SSDR, presentación de A. Leiva",
+  ACT:"Acta de articulación HPM–SSDR, 05-08-2026",
+  NAV:"Protocolo de Funcionamiento Navegadores en Red HPM, 2026",
+  MIN:"Minuta de Trabajo N°1, 23-07-2026",
+  DIR:"Directriz de P. Muñoz sobre el modelo de referentes y la trayectoria completa, 10-11-2026",
+  DM:"Documento maestro de contexto (síntesis previa, sin contraste con fuente primaria)",
+  PRO:"Propuesta de este trabajo, para validar"
+};
+
+var PHASES={
+ O:{t:"Origen",s:"Antes de la derivación",col:"var(--l-dato)"},
+ H:{t:"Hospital de especialidad",s:"Consulta nueva de especialidad (CNE)",col:"var(--l-actor)"},
+ P:{t:"Después de la atención",s:"Continuidad del cuidado",col:"var(--l-regla)"},
+ X:{t:"Transversal",s:"Se activa en cualquier hito",col:"var(--t-propuesta)"}
+};
+var COLS=[
+ {id:"o1",ph:"O",c:"O1",t:"Primera atención en el origen",s:"Acceso a la consulta que gatilla la derivación"},
+ {id:"o2",ph:"O",c:"O2",t:"Indicación, derivación y datos",s:"SIC u OA, datos de contacto, COVICOM"},
+ {id:"h1",ph:"H",c:"H1",t:"Vinculación",s:"Primer contacto y validación de datos"},
+ {id:"h2",ph:"H",c:"H2",t:"Monitoreo y espera",s:"Seguimiento y gestión de barreras"},
+ {id:"h3",ph:"H",c:"H3",t:"Agenda y citación",s:"Apertura de agenda y citación"},
+ {id:"h4",ph:"H",c:"H4",t:"Confirmación",s:"Confirmación y recordatorio"},
+ {id:"h5",ph:"H",c:"H5",t:"Atención, NSP y bloqueos",s:"Reagendamiento y no presentación"},
+ {id:"p1",ph:"P",c:"P1",t:"Post atención",s:"Comprensión de indicaciones y próximos pasos"},
+ {id:"p2",ph:"P",c:"P2",t:"Contrarreferencia y continuidad",s:"Retorno al origen o nuevas prestaciones"},
+ {id:"x1",ph:"X",c:"X1",t:"No contactabilidad",s:"Gestión escalonada de quienes no responden"},
+ {id:"x2",ph:"X",c:"X2",t:"Salida y cierre",s:"Vínculo recuperado, egreso o caso vigente"}
+];
+var SCOPES={full:[0,1,2,3,4,5,6,7,8,9,10],deriv:[1,2,3,4,5,6,7,8,9,10],hosp:[2,3,4,5,6,7,9,10],nc:[9,10]};
+var SCOPE="full";
+function visCols(){return SCOPES[SCOPE];}
+var JOURNEY={
+ o1:{v:"Consulta en su centro de salud por un problema que no se resuelve ahí. El establecimiento la llama y la cita.",p:"Que llegue a la consulta que decide si necesita un especialista.",q:"Establecimiento de origen. Hipótesis por levantar."},
+ o2:{v:"El equipo le indica una interconsulta u OA, le pide un número vigente y, si corresponde, firma el COVICOM.",p:"Dejar datos verificados y un compromiso de comunicación antes de que empiece la espera.",q:"Establecimiento de origen. Registro HPM evalúa la pertinencia."},
+ h1:{v:"Recibe un primer llamado o mensaje que confirma si aún necesita la atención.",p:"Validar datos y necesidad.",q:"Contacto HPM. Navegadores en casos priorizados."},
+ h2:{v:"Espera. Puede recibir contactos de seguimiento y ayuda con barreras para asistir.",p:"Que la espera no rompa el vínculo.",q:"Navegadores y referente con su contraparte. El Manual no lo describe."},
+ h3:{v:"Le ofrecen fecha, hora, profesional y lugar.",p:"Convertir la espera en una cita.",q:"Contacto HPM, con CAE y Registro."},
+ h4:{v:"Confirma o anula la cita. Recibe un recordatorio.",p:"Proteger el cupo.",q:"Contacto HPM."},
+ h5:{v:"Asiste a la consulta, no se presenta, o su hora se bloquea y la reagendan.",p:"Que la atención ocurra o se reprograme sin perderla.",q:"CAE y Contacto HPM."},
+ p1:{v:"Recibe indicaciones y, en algunos casos, un llamado para saber si las entendió.",p:"Comprensión de lo indicado y próximos pasos.",q:"Navegadores en sus especialidades. En el resto, sin definir."},
+ p2:{v:"Vuelve a su territorio con alta, control o nuevos exámenes.",p:"Continuidad del cuidado, más allá de la primera consulta.",q:"CAE, establecimiento de origen y Continuidad de la Atención del SSDR."},
+ x1:{v:"No responde. Alguien la busca con medios cada vez más costosos.",p:"Recuperar el vínculo.",q:"Referente HPM con su contraparte, y SSDR."},
+ x2:{v:"Recupera su cita, o queda egresada, exceptuada o con caso vigente, con respaldo.",p:"Cierre trazable.",q:"Registro HPM, referente y SSDR."}
+};
+
+var LAYERS=[
+ {id:"A",t:"Actores y responsabilidad primaria",col:"var(--l-actor)",rows:[
+  {id:"per",t:"Persona usuaria y red de apoyo",s:"Familiar, cuidador o contacto alternativo autorizado"},
+  {id:"est",t:"Referente de contactabilidad del establecimiento",s:"Contraparte territorial: SOME u otra persona designada; OIRS y equipos de sector"},
+  {id:"ref",t:"Referente territorial HPM",s:"Par de la contraparte. Hoy lo cumple la UGT en sus territorios"},
+  {id:"reg",t:"Registro y Gestión de Demanda HPM",s:"Lista de espera y SIGTE"},
+  {id:"cc",t:"Contacto HPM",s:"Centro de Contacto de Pacientes y unidades citadoras",flag:"Estructura en revisión"},
+  {id:"cae",t:"CAE y unidades clínicas HPM",s:"Agendas, bloqueos y atención"},
+  {id:"nav",t:"UGT y Navegadores en Red",s:"Casos priorizados y acompañamiento"},
+  {id:"ssdr",t:"Servicio de Salud del Reloncaví",s:"Contactabilidad y Continuidad de la Atención"}
+ ]},
+ {id:"B",t:"Reglas del proceso",col:"var(--l-regla)",rows:[
+  {id:"canal",t:"Canales e intentos",s:"Lo que fija la OT"},
+  {id:"plazo",t:"Plazos y salidas de registro",s:"Causales y condiciones"}
+ ]},
+ {id:"C",t:"Datos, registros y alertas",col:"var(--l-dato)",rows:[
+  {id:"sis",t:"Sistemas y fuentes de datos",s:"Dónde se busca y dónde se registra"},
+  {id:"regi",t:"Registro y verificables",s:"Qué debe quedar respaldado"}
+ ]}
+];
+
+var CELLS=[];
+/* C(fila, columna, tipo, estado, texto, fuentes, {d:[[etiqueta,texto]], g:[ids de brecha]}) */
+function C(r,c,t,e,x,s,o){o=o||{};CELLS.push({r:r,c:c,t:t,e:e,x:x,s:s,d:o.d||[],g:o.g||[]});}
+
+/* ---- T0 Origen y datos ---- */
+C("per",1,"N","D","Declara y mantiene al día sus datos de contacto y firma el COVICOM, uno por cada prestación en espera.",["OT §6"],{g:["G2"],d:[["Formato","Físico o digital. Se aplica de preferencia en la vinculación y, si no se hizo, en los contactos siguientes."],["Efecto","En lista de espera no GES permite un flujo de no contactabilidad más corto (OT §8.1)."],["HPM hoy","El Acta del 05-08-2026 informa avance en la implementación del COVICOM. La cobertura no está documentada."]]});
+C("est",1,"N","D","Al generar la SIC u OA, registra y verifica teléfonos, contacto alternativo, domicilio y comuna, e informa cómo funciona la red.",["OT §5.1","OT §7.3","DM"],{g:["G8"],d:[["Por verificar","La premisa figura en el documento maestro como parte de la presentación de A. Leiva. No aparece en el texto del PPTX revisado."]]});
+C("est",1,"X","Q","Verifica y actualiza los datos de contacto en el sistema del establecimiento (SOME) y avisa al HPM cuando cambian.",["ACT","DIR"],{g:["G8","G19"],d:[["Por definir","Medio y plazo del aviso, y qué sistema es la fuente oficial de cada dato."]]});
+C("reg",1,"N","D","Evalúa la pertinencia clínica y administrativa de la SIC u OA antes de iniciar la vinculación.",["OT §5.1"]);
+C("ssdr",1,"P","E","Comparte cada trimestre la base de contactabilidad del MINSAL (ownCloud) y gestiona los accesos a la API de Contactabilidad.",["ACT"],{g:["G14"],d:[["API","Se contempla crear perfiles para los referentes de contactabilidad, una vez definidos el flujo y los responsables."]]});
+C("sis",1,"N","D","RAYEN y Expertos están en uso. La OT recomienda además la búsqueda ampliada (Registro Civil, BancoEstado, MIDESO, MINVU, policías) con resguardo de confidencialidad.",["OT §5.1","FLU"],{g:["G17"]});
+C("regi",1,"N","D","Conjunto mínimo de datos (N°820): RUN y su condición, nombres, nombre social, nacimiento, previsión y PRAIS, domicilio con ruralidad, teléfonos, correo y prestación en espera.",["OT §7.3"]);
+
+/* ---- T1 Vinculación ---- */
+C("per",2,"P","E","Responde si aún necesita la prestación y deja un número alternativo o de un familiar.",["MAN §11.1"]);
+C("reg",2,"P","E","Entrega las listas de espera nuevas y de controles según origen: Registros, GES, Teleprocesos, Navegadores.",["MAN §7.1"],{d:[["Por confirmar","Quién prepara cada lista, con qué control de calidad y cómo se avisa al equipo que contacta."]]});
+C("cc",2,"P","E","Verifica datos y hace al menos 3 intentos en bloques horarios distintos, el mismo día o el siguiente, por WhatsApp o llamada. Registra el resultado.",["MAN §7.1"],{g:["G1","G7","G13"],d:[["Contacto efectivo","Persona informada de su espera. Postergación, solo en personas nuevas. Egreso en IC con voucher: rechazo definitivo, extrasistema, atención realizada, fallecido, traslado coordinado."],["No contactado","Sin respuesta en tres llamados en bloques horarios distintos, o número equivocado sin más números disponibles."],["Canales autorizados","WhatsApp y llamada telefónica."],["Contraste con la OT","La OT pide al menos 3 llamadas a todos los números, en días y horarios diferentes, una de ellas fuera de horario hábil (§8.1)."]]});
+C("nav",2,"P","E","Vincula casos priorizados con campañas automatizadas de WhatsApp (Portal 0) y llamada. Confirma la necesidad y actualiza datos.",["MIN","NAV"],{g:["G15"],d:[["Alcance hoy","Tres especialidades definidas por el HPM: Ginecología CAU, Cardiología CAU y Dermatología P1. Consultas nuevas priorizadas."]]});
+C("canal",2,"N","D","Prefiere medios masivos y automatizados, con enlace al Portal Paciente. Sin automatización, vincula un equipo con formación en salud.",["OT §5.2"],{g:["G12"]});
+C("plazo",2,"N","E","Sin contacto, pasa a gestión de no contactabilidad. Si la persona no requiere la prestación: egreso, excepción o cierre de garantía.",["OT §5.2","MAN §7.1"]);
+C("regi",2,"P","E","Registro íntegro en los sistemas institucionales: resultado, quién contesta, datos actualizados y voucher.",["MAN §7.1"],{g:["G8"]});
+
+/* ---- T2 Monitoreo ---- */
+C("per",3,"N","D","Mantiene comunicación en ambos sentidos: dudas, cambios en su salud y barreras para asistir.",["OT §5.3"]);
+C("est",3,"X","Q","Detecta barreras territoriales y mantiene al día los datos de las personas de su comuna que esperan atención.",["ACT","DIR"],{g:["G19"]});
+C("ref",3,"P","E","Mantiene contacto permanente con su contraparte territorial y trabaja con planillas compartidas: controles atrasados, horas y exámenes.",["MIN","DIR"],{g:["G16","G18"],d:[["Hoy","La UGT tiene un referente por territorio: provincia de Palena, comuna de Cochamó y algunas islas de Calbuco. Cada referente tiene una contraparte en el establecimiento."],["Alcance","Esta práctica es la base del modelo propuesto para la contactabilidad en toda la red."]]});
+C("cc",3,"N","R","El Manual HPM no incluye protocolo de monitoreo y seguimiento, que la OT define como un subproceso.",["OT §5.3","MAN"],{g:["G3"]});
+C("nav",3,"P","E","Acompaña de forma activa: contacto permanente, barreras y estados de caso (gestión activa, en proceso, post atención, cierre).",["NAV","MIN"],{d:[["UGT","Gestiona controles atrasados de territorios priorizados y coordina horas, controles y exámenes con los referentes territoriales."]]});
+C("canal",3,"N","D","Usa el canal bidireccional que la persona declara y prioriza por antigüedad, estratificación, edad u otros criterios locales.",["OT §5.3"]);
+C("regi",3,"N","D","Registra el motivo «monitoreo y seguimiento» y el plan de gestión de la espera según riesgo.",["OT §5.3"]);
+
+/* ---- T3 Agenda y citación ---- */
+C("per",4,"P","E","Acepta, pide cambio o rechaza la hora. Si rechaza, indica el motivo.",["MAN §11.3"]);
+C("reg",4,"P","E","Identifica a las personas citables según los cupos de cada apertura de agenda.",["FLU"]);
+C("cc",4,"P","E","Revisa solicitud y agenda, contacta, informa fecha, hora, profesional, consulta y lugar, confirma y registra.",["MAN §7.2"],{g:["G13"],d:[["Resultados","Citado, reagendado, postergación (solo personas nuevas) o egreso en IC con voucher. No contactado: tres llamados sin respuesta o número equivocado."],["Canales autorizados","WhatsApp u otro canal autorizado, y llamada telefónica."]]});
+C("cae",4,"P","E","Abre la agenda mensual o trimestral y define los cupos disponibles.",["FLU"]);
+C("nav",4,"P","D","Coordina la repriorización y la agenda de sus casos con los equipos competentes.",["DM"]);
+C("canal",4,"N","D","Agenda por llamada o mensajería directa, con acceso al Portal Paciente. Reprogramar por NSP o bloqueo sigue el mismo flujo.",["OT §5.4"],{g:["G12"]});
+C("sis",4,"P","E","SIGTE, Expertos y RAYEN registran la citación. El voucher respalda el egreso.",["MAN","FLU"],{g:["G8"]});
+
+/* ---- T4 Confirmación ---- */
+C("per",5,"P","E","Confirma o anula la cita. Si anula, elige uno de seis motivos.",["MAN §11.5"]);
+C("cc",5,"P","E","Confirma dentro del plazo institucional de 72 horas y recuerda 24 horas antes. Ante rechazo o falta de confirmación activa el flujo definido.",["MAN §7.3"],{d:[["Plazo","72 horas para la confirmación y recordatorio 24 horas antes de la cita."]]});
+C("nav",5,"P","D","Verifica que la persona conoce la cita y puede asistir.",["DM"]);
+C("canal",5,"N","E","Prefiere vías masivas, mensajería o correo, según la preferencia de la persona.",["OT §5.4","MAN"]);
+C("plazo",5,"N","D","Indicador OT N°5: porcentaje de confirmaciones enviadas sobre personas agendadas, cada mes.",["OT Anexo 8"]);
+
+/* ---- T5 Atención, NSP y bloqueos ---- */
+C("per",6,"N","D","Asiste o avisa que no puede. Si no se presenta (NSP), vuelve a ser contactada.",["OT §5.1"]);
+C("cae",6,"P","E","Informa formalmente el bloqueo total o parcial de agenda y entrega la nueva fecha según sus indicaciones.",["MAN §7.4"]);
+C("cc",6,"P","E","Recibe la nómina de afectados, prioriza, informa, ofrece nueva fecha o deja pendiente para la próxima apertura, registra y retroalimenta a CAE.",["MAN §7.4"]);
+C("cc",6,"N","R","El Manual no describe qué hacer ante un NSP. La OT remite a su OT de Gestión de Agendas y a la normativa GES.",["OT §5.1","MAN"],{g:["G3"]});
+C("nav",6,"P","E","Mantiene en gestión activa a la persona con contacto efectivo que no asistió.",["NAV"]);
+C("plazo",6,"N","D","GES: excepción por inasistencia injustificada a 2 citaciones efectivas. Cierre de garantía a la tercera.",["OT §7.2"],{g:["G10"]});
+
+/* ---- T6 Post atención ---- */
+C("est",8,"N","D","Recibe la contrarreferencia al alta y retoma el seguimiento en el nivel primario.",["OT §5.5","DM"],{d:[["Relación","El detalle está en el Blueprint de Contrarreferencia y Transición Asistencial HPM-APS."]]});
+C("cae",7,"P","D","Atiende y define alta, controles o contrarreferencia.",["DM"]);
+C("cc",7,"N","R","El Manual HPM no incluye contactabilidad post atención.",["OT §5.5","MAN"],{g:["G3","G21"]});
+C("nav",7,"P","E","Acompaña tras la atención: comprensión de indicaciones, próximos pasos y continuidad del cuidado.",["NAV"]);
+C("canal",7,"N","D","Seguimiento por llamada, mensajería o correo, con medición de satisfacción. Sin contacto, se cierra el proceso de contactabilidad.",["OT §5.5"]);
+
+/* ---- T7 No contactabilidad ---- */
+C("per",9,"N","D","Puede responder por cualquier canal, el portal, la línea 600 o la OIRS, dentro del plazo de 30 días que se le informa.",["OT §8","FLU"]);
+C("est",9,"P","E","La OIRS recibe el listado del aviso radial, recibe las respuestas y actualiza datos en RAYEN y Expertos.",["FLU"],{g:["G9","G17"],d:[["Hoy","La coordinación con SOME, OIRS y otros actores depende en parte de contactos informales entre funcionarios."]]});
+C("est",9,"X","Q","Recibe del referente territorial HPM la solicitud con ficha mínima, busca a la persona con medios locales y devuelve un resultado estandarizado.",["DIR","PRO"],{g:["G9","G19"],d:[["Medios locales","SOME, equipo de sector, OIRS, visita del establecimiento, según capacidad."],["Resguardo","No comparte información clínica con agentes comunitarios ni la expone en medios abiertos (OT §8)."],["Por acordar","Ficha mínima, plazo de respuesta, formato del resultado y quién subroga a la contraparte."]]});
+C("ref",9,"X","Q","Recibe del Contacto HPM los casos no contactables de su territorio, los deriva a su contraparte con ficha mínima y vigila plazo y devolución.",["DIR","PRO"],{g:["G18","G19"],d:[["Por qué","Da una puerta de entrada conocida en cada establecimiento. Reemplaza los contactos informales por un vínculo directo y trazable."],["Ficha mínima","Identificación, motivo, gestiones ya hechas con fecha y canal, y resultado esperado. Sin datos clínicos."],["Por acordar","Plazo de respuesta, formato de devolución y qué hace el referente cuando no hay respuesta."]]});
+C("reg",9,"P","E","Informa a SSDR el listado de personas no contactables y recibe el listado devuelto con el nuevo estado.",["FLU"]);
+C("cc",9,"P","E","Registra «no contactado», cita a quienes SSDR ubica y revisa atenciones en la red 2 meses antes y 2 después del aviso radial.",["MAN §5","FLU"],{g:["G1","G7"],d:[["Por confirmar","El flujo menciona prioridad en usuarios COMGES. Es una lectura obtenida por OCR del esquema; confirmar con A. Leiva."]]});
+C("nav",9,"P","E","Mantiene en gestión activa a quien no pudo contactar y recibe solo los casos que cumplen criterios de ingreso y capacidad.",["NAV","DM"]);
+C("ssdr",9,"P","E","Busca datos de contacto en RAYEN y Expertos y marca a la persona como «NO CONTACTABLE» en el monitoreo.",["FLU"]);
+C("ssdr",9,"P","E","Envía el listado a aviso radial (empresa licitada) y a las OIRS de cada establecimiento.",["FLU"],{g:["G5","G17"],d:[["Hoy","Sin calendario de avisos. Según el flujo, respondían solo Chaitén y Fresia. Se evalúa mantener la estrategia para toda la red."]]});
+C("ssdr",9,"P","E","Realiza visita domiciliaria a quienes no respondieron al aviso radial.",["FLU"],{g:["G6","G11"]});
+C("ssdr",9,"X","Q","Coordina la red de referentes, resuelve lo que un establecimiento no puede hacer y supervisa plazos y devoluciones.",["ACT","DIR"],{g:["G9"],d:[["Base","El Acta acuerda definir responsables de contactabilidad en cada establecimiento y mecanismos de coordinación y retroalimentación."]]});
+C("canal",9,"N","D","Con COVICOM: 2 correos y 2 mensajes en un mes (separados al menos una semana), 3 llamadas a todos los números en días y horarios distintos, una fuera de horario hábil, y aviso en el Portal Paciente por 30 días.",["OT §8.1"],{g:["G1","G2","G12"],d:[["GES","La frecuencia depende del plazo de la garantía de oportunidad."],["Contenido","Por correo y mensaje no se comparte información sensible; se incluye el enlace al portal."]]});
+C("canal",9,"N","D","Sin COVICOM, y siempre en GES: lo anterior más visita domiciliaria o carta certificada. La carta no sirve en GES por sus plazos.",["OT §8.2"],{g:["G11"],d:[["Visita","Funcionario, consejo de desarrollo local o empresa autorizada. Requiere certificado de contacto con identificación, dirección, día, hora y firma."],["Acuerdo en red","Para ejecutarla se requieren acuerdos firmados por resoluciones locales que designen responsables."]]});
+C("canal",9,"N","E","Opcionales: aviso radial (3 llamados, uno fuera de horario hábil, con grabación), redes sociales, campañas y organizaciones comunitarias. Redes y campañas no validan egresos.",["OT §8.1","OT §8"],{d:[["Radial","Sirve sobre todo en ruralidad y zonas de difícil acceso. En agendas, con citación extraordinaria, puede validar una causal de egreso."],["Comunitarias","Pueden facilitar la búsqueda, pero no son un medio válido para respaldar una salida de registro."]]});
+C("plazo",9,"N","D","30 días corridos sin contacto. Con COVICOM, desde el inicio del proceso. Sin COVICOM, desde el inicio del segundo proceso (visita o carta). Cumplido el plazo, se egresa en no GES.",["OT §8.1","OT §8.2"],{g:["G2"],d:[["Carta certificada","Los 30 días parten de la entrega, respaldada por quien distribuye la carta."]]});
+C("sis",9,"N","D","Portal Paciente (canal abierto y permanente que exige la OT), RAYEN, Expertos, SIGTE y API de Contactabilidad del MINSAL.",["OT §8","ACT"],{g:["G12"]});
+C("regi",9,"N","D","Cada intento queda con canal, fecha, hora, receptor y resultado. Llamadas externas con grabación. Visita con certificado de contacto firmado.",["OT §3.1","OT §8.2"]);
+
+/* ---- T8 Salida y cierre ---- */
+C("per",10,"N","D","Si se recupera el vínculo, actualiza sus datos y COVICOM y acuerda nueva hora. Si no, queda egresada, exceptuada o con garantía cerrada, con respaldo.",["OT §8.1","OT §7"]);
+C("est",10,"P","D","Si la persona ya no necesita la atención, hace el rechazo desde el establecimiento de origen.",["FLU"]);
+C("ref",10,"X","Q","Recibe el resultado de su contraparte, lo entrega al Contacto HPM o a Registro y verifica quién retoma la citación (circuito cerrado).",["DIR","PRO"],{g:["G4"],d:[["Por qué","No basta con que el establecimiento informe un número nuevo. Debe haber devolución verificable y una acción posterior definida."]]});
+C("reg",10,"P","E","Egresa en SIGTE por causal 11 tras el aviso radial y la visita sin resultado, con el formulario o voucher de respaldo.",["FLU"],{g:["G8"],d:[["Respaldo","El flujo indica subir el formulario o voucher a poli digital."]]});
+C("cc",10,"P","D","Retoma la citación de las personas ubicadas. La devolución debe traer ID y los números donde hubo contacto efectivo.",["FLU"]);
+C("nav",10,"P","E","Cierra su gestión cuando la persona egresa o termina la gestión. No continúa el acompañamiento.",["NAV"]);
+C("ssdr",10,"P","E","Devuelve los resultados por correo, acordado una vez al mes antes de la apertura de agenda. El año pasado hubo 2 devoluciones y ninguna retroalimentación.",["FLU"],{g:["G4"]});
+C("plazo",10,"N","D","No GES: salida por verificación interna, solo por contactabilidad o por no contactabilidad. GES: excepción permanente o cierre por «contacto no corresponde», tras agotar las gestiones de la normativa GES.",["OT §7.1","OT §7.2"],{g:["G10"]});
+C("plazo",10,"X","R","Quién resuelve administrativamente cada salida: sin definir.",["PRO","DM"]);
+C("plazo",10,"N","D","Se cataloga como inubicable solo después de seguir el flujo de no contactabilidad que corresponde (indicador OT N°8).",["OT Anexo 8"]);
+C("regi",10,"N","D","Registro conservado 15 años (Ley 20.584). Grabaciones de externos, 5 años. Incluye receptor, canal, fecha, hora, motivo, comprensión confirmada y responsable del respaldo.",["OT §3.1","OT §7.3"]);
+
+/* ---- O1 Primera atención en el origen (hipótesis por levantar) ---- */
+C("per",0,"P","D","Accede a su primera atención en el centro de origen. Responde los llamados del establecimiento y mantiene su teléfono vigente.",["DIR"],{g:["G20"]});
+C("est",0,"P","D","El establecimiento de origen contacta y cita a la persona para la atención médica inicial, que puede terminar en una derivación. Es un mini proceso de contactabilidad propio.",["DIR"],{g:["G20"],d:[["Hipótesis","No está documentado en los materiales revisados. Se deja expresado para levantarlo con APS."],["Si se omite","Si la mesa decide partir desde la derivación, se acota con el selector de alcance."]]});
+C("canal",0,"N","D","La OT cubre mediana y alta complejidad. Sus principios (lenguaje claro, canal declarado, resguardo de datos) sirven de referencia en el origen, pero no lo obligan.",["OT §3"],{g:["G20"]});
+C("sis",0,"P","D","Cada establecimiento usa su propio sistema local. Se desconoce cómo registra los intentos y resultados de contacto antes de derivar.",["DIR"],{g:["G20"]});
+C("regi",0,"X","Q","Dejar registrado el contacto efectivo y los datos verificados en la primera atención, para que viajen con la SIC (conjunto mínimo N°820).",["OT §7.3","PRO"],{g:["G20"]});
+
+/* ---- O2: referente HPM ---- */
+C("ref",1,"X","Q","Acuerda con su contraparte qué datos de contacto viajan en la SIC y cómo se corrigen cuando cambian.",["DIR","PRO"],{g:["G8"]});
+
+/* ---- P2 Contrarreferencia y continuidad ---- */
+C("est",8,"X","Q","Actualiza los datos de contacto de la persona en cada control y avisa al HPM cuando cambian.",["DIR","PRO"],{g:["G8"]});
+C("cae",8,"P","D","Define alta, controles o contrarreferencia y la registra para que llegue al establecimiento de origen.",["DM"],{d:[["Detalle","Está en el Blueprint de Contrarreferencia y Transición Asistencial HPM-APS, que cita el ORD N°2301 y la Res. Exenta N°6041-2025. Verificar allí."]]});
+C("nav",8,"P","D","Verifica que la persona tenga definida una siguiente acción asistencial (control, examen, alta o contrarreferencia) antes de cerrar su gestión.",["NAV"],{g:["G21"],d:[["Alcance hoy","Solo en las tres especialidades de Navegadores. El criterio de cierre no se ha confirmado con el protocolo."]]});
+C("ref",8,"X","Q","Cuando la persona vuelve a su territorio, verifica con su contraparte que retomó el control y que los datos de contacto quedaron al día.",["DIR","PRO"],{g:["G21"]});
+C("ssdr",8,"P","D","El referente de Continuidad de la Atención articula el nivel hospitalario con el primario.",["DM"],{d:[["Por confirmar","Viene del documento maestro, sin contraste con fuente primaria."]]});
+C("canal",8,"X","Q","Lo que sigue a la atención (nuevo control, examen, otra especialidad) abre un nuevo ciclo: la persona vuelve a entrar desde la indicación.",["OT §5.5","PRO"],{g:["G21"]});
+C("plazo",8,"X","Q","Los plazos de la contrarreferencia están en su propio blueprint. Aquí falta fijar quién vigila que se cumplan en las personas que estuvieron en espera.",["PRO"],{g:["G21"]});
+C("regi",8,"X","Q","Queda registrada la siguiente acción asistencial y su fecha, para poder medir la continuidad más allá de la primera consulta.",["PRO"],{g:["G21"]});
+
+
+var GAPS=[
+ {id:"G1",sev:"preventivo",t:"«No contactado» se define más corto que en la OT",x:"El Manual y el protocolo de Navegadores cuentan 3 intentos en bloques horarios distintos del mismo día o el siguiente. La OT pide al menos 3 llamadas a todos los números del usuario y de su responsable de cuidados, en días y horarios diferentes, una fuera de horario hábil. Un egreso respaldado solo con la definición local podría no sostenerse.",s:["MAN §5","NAV","OT §8.1"]},
+ {id:"G2",sev:"preventivo",t:"COVICOM y los dos flujos de no contactabilidad no están en el Manual",x:"El Manual HPM no menciona el COVICOM ni los plazos de 30 días, ni la diferencia entre el flujo con y sin COVICOM. El Acta informa que la implementación del COVICOM está en avance, sin cobertura documentada. De esa cobertura depende qué flujo se aplica a cada persona.",s:["MAN","OT §6","OT §8","ACT"]},
+ {id:"G3",sev:"preventivo",t:"El Manual cubre 4 de los 9 hitos desde la derivación",x:"Cubre vinculación, citación, confirmación y bloqueo con reagendamiento. No describe monitoreo y seguimiento, NSP, post atención ni la gestión de no contactabilidad, que la OT trata como subprocesos o capítulos propios. Tampoco toca el origen ni la contrarreferencia.",s:["MAN","OT §5","OT §8"]},
+ {id:"G4",sev:"continuidad",t:"La devolución al HPM es mensual y sin retroalimentación",x:"Las devoluciones de campañas se acordaron una vez al mes, antes de la apertura de agenda. El año pasado hubo 2 y no hubo retroalimentación en todo el año. Una persona ubicada puede quedar sin cita porque nadie retoma el caso. La devolución debería traer ID y números con contacto efectivo.",s:["FLU"]},
+ {id:"G5",sev:"preventivo",t:"El aviso radial no tiene calendario y su efecto es acotado",x:"Falta un calendario de avisos para trabajar barridos trimestrales. Según el flujo, respondían solo Chaitén y Fresia. En la OT es un medio opcional, útil sobre todo en ruralidad. Conviene decidir con datos si se mantiene para toda la red.",s:["FLU","ACT","OT §8.1"]},
+ {id:"G6",sev:"preventivo",t:"Visitas domiciliarias sin calendario ni acuerdo formal evidenciado",x:"Falta un calendario de visitas ligado a las aperturas de agenda, para que las personas encontradas puedan ser citadas. La OT exige acuerdos en red firmados por resoluciones locales que designen responsables, y un certificado de contacto. No encontré ese acuerdo en los documentos revisados.",s:["FLU","OT §8","OT §8.2"]},
+ {id:"G7",sev:"continuidad",t:"El Centro de Contacto aparece como eliminado en el Acta",x:"El Acta del 05-08-2026 habla de los cambios organizacionales del Departamento de Procesos Ambulatorios de Especialidad y de la eliminación del Centro de Contacto existente. El Manual, aprobado el 20-05-2026, lo hace custodio del procedimiento. El carril «Contacto HPM» puede quedar sin titular. Hay que confirmar con A. Leiva y la Subdirección qué ocurre y quién asume las funciones.",s:["ACT","MAN","Res. J1907"]},
+ {id:"G8",sev:"preventivo",t:"Vouchers tardíos, procesos manuales y sistemas sin integración",x:"El Acta señala demoras en registrar los respaldos administrativos, procesos manuales por falta de integración entre sistemas, duplicidad de trabajo y riesgo de inconsistencias. Los datos de contacto no tienen un mecanismo común de actualización entre establecimientos.",s:["ACT","OT §7"]},
+ {id:"G9",sev:"continuidad",t:"No hay referentes formales de contactabilidad en los establecimientos",x:"Parte de la coordinación con SOME y OIRS depende de relaciones personales. Ni el flujo ni el Acta fijan a quién se escribe, qué información lleva, en qué plazo se responde y quién retoma. El Acta acuerda definir estos responsables. Esta es la brecha que el modelo de referentes busca cerrar.",s:["FLU","ACT","DIR"]},
+ {id:"G10",sev:"continuidad",t:"El flujo HPM–SSDR cubre lista de espera no GES, no se ve uno para GES",x:"La OT dice que en GES solo aplica el flujo sin COVICOM, con visita domiciliaria, y que los plazos dependen de la garantía de oportunidad. El esquema revisado habla de registro de lista de espera no GES. Hay que confirmar cómo se gestionan las personas con garantía.",s:["OT §8.2","OT §7.2","FLU"]},
+ {id:"G11",sev:"aclarar",t:"La OT admite dos lecturas sobre la visita domiciliaria con COVICOM",x:"El §8.1 dice que con COVICOM no son obligatorias las cartas ni las visitas, y que a los 30 días se egresa. Pocas líneas después dice que, a pesar del COVICOM, todos los usuarios deberán tener gestión de visita domiciliaria. Conviene consultarlo formalmente al MINSAL o al SSDR antes de fijar el flujo.",s:["OT §8.1","OT §8.2"]},
+ {id:"G12",sev:"preventivo",t:"El Portal Paciente no aparece como operativo en la red",x:"La OT exige un canal abierto y permanente, como un portal paciente, para que la persona tome contacto en el plazo definido, y lo usa como hito de 30 días. El Acta lo menciona como herramienta a considerar. Sin portal, los plazos de la OT no se pueden respaldar del mismo modo.",s:["OT §8","OT Anexo 6","ACT"]},
+ {id:"G13",sev:"fortaleza",t:"Manual aprobado con protocolos, scripts y resultados estandarizados",x:"Resolución J1907 del 20-05-2026. Define canales, resultados posibles por protocolo, scripts de WhatsApp y llamada, plazos de confirmación y recordatorio, y motivos de anulación. Distribución a las jefaturas clave.",s:["MAN","Res. J1907"]},
+ {id:"G14",sev:"fortaleza",t:"Consolidado de no contactables y seguimiento permanente",x:"El HPM usa campañas de contactabilidad, la plataforma Experto y un consolidado de personas no contactables. El SSDR distribuye cada trimestre la base de contactabilidad del MINSAL.",s:["ACT"]},
+ {id:"G15",sev:"fortaleza",t:"Navegadores ya usa campañas WhatsApp y tiene un estado «no contactado»",x:"Portal 0 para campañas automatizadas, acompañamiento activo y estados de caso. El protocolo trata «no contactado» como gestión activa y no como cierre.",s:["NAV","MIN"]},
+ {id:"G16",sev:"fortaleza",t:"La UGT ya trabaja con un referente por territorio y una contraparte local",x:"Funciona hoy en la provincia de Palena, la comuna de Cochamó y algunas islas de Calbuco, con planillas compartidas. Es un modelo probado que se puede replicar para la contactabilidad.",s:["MIN","DIR"]},
+ {id:"G17",sev:"aclarar",t:"Qué datos viajan en los avisos radiales y listados",x:"Los listados pasan al SSDR, a las OIRS y a una empresa licitada. La OT exige resguardar la información sensible en todos los medios y prohíbe usar redes sociales para respaldar egresos. Falta confirmar qué datos contienen los listados y los avisos, y quién los custodia.",s:["FLU","OT §7.3","OT §8"]},
+ {id:"G18",sev:"aclarar",t:"Quién es el referente territorial HPM fuera de los territorios de la UGT",x:"La UGT cubre Palena, Cochamó y algunas islas de Calbuco. Para Los Muermos, Frutillar y el resto de la red no está definido quién cumple ese rol en el HPM. Con un solo referente por territorio también falta definir quién lo reemplaza.",s:["DIR","MIN"]},
+ {id:"G19",sev:"preventivo",t:"Un modelo por referentes depende de las personas",x:"Si la contraparte se cambia, se enferma o sale de vacaciones, el circuito se corta. Hacen falta un subrogante, un formato común de solicitud y devolución, un directorio vigente y un plazo de respuesta acordado. Además, el Servicio de Salud debe validar el modelo para que no se perciba como una imposición del HPM.",s:["PRO","ACT"]},
+ {id:"G20",sev:"aclarar",t:"El proceso de contactabilidad en el origen no está documentado",x:"La OT cubre mediana y alta complejidad. Lo que hacen los centros de origen para que la persona llegue a su primera atención, y lo que registran antes de derivar, se ha supuesto y no se ha levantado. Conviene preguntarlo a APS antes de afirmar algo. Si la mesa decide partir desde la derivación, se omite con el selector de alcance.",s:["OT §3","DIR"]},
+ {id:"G21",sev:"continuidad",t:"Después de la consulta nueva no hay una siguiente acción asegurada para todos",x:"La verificación de que existe un control, examen o contrarreferencia posterior se describe solo para las tres especialidades de Navegadores. Para el resto, el proceso de contactabilidad termina con la atención. Si nadie vigila el paso siguiente, la persona puede volver a quedar esperando.",s:["NAV","OT §5.5","MAN"]}
+];
+
+var DECS=[
+ "¿Quién designa a la contraparte de cada establecimiento: el SSDR o cada establecimiento? ¿Puede ser el SOME o debe ser otra función?",
+ "¿Quién es el referente territorial HPM en los territorios donde no está la UGT?",
+ "¿Quién subroga a cada referente y cómo se mantiene un directorio vigente?",
+ "¿Cuál es el evento formal que activa el subproceso de no contactabilidad?",
+ "¿Qué resultados de contacto se registran y cómo se clasifican? (número equivocado, sin respuesta, mensaje no entregado, respuesta ambigua)",
+ "¿Se alinea el Manual HPM con las 3 llamadas de la OT en días y horarios distintos?",
+ "¿Qué información mínima lleva la solicitud al establecimiento, en qué plazo se responde y cómo se devuelve el resultado?",
+ "¿Qué unidad hace la búsqueda complementaria y qué fuentes puede consultar?",
+ "¿Cuándo se pasa de los medios locales a los de mayor costo: aviso radial y visita domiciliaria?",
+ "¿Quién tiene atribuciones para resolver administrativamente un egreso, una excepción o un cierre?",
+ "¿Cómo se gestionan las personas con garantía GES?",
+ "¿Dónde se registra cada gestión y cómo se evita duplicarla?",
+ "¿Qué indicadores medirán si el modelo mejora la continuidad, y con qué línea de base?",
+ "¿Qué ocurre con el Centro de Contacto y quién asume sus funciones?",
+ "¿Desde qué punto parte el proceso que se estandariza: el centro de origen, la derivación o el hospital de especialidad?",
+ "¿Quién responde por que exista una siguiente acción asistencial después de la CNE?"
+];
+
+/* ============ UTILIDADES ============ */
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function $(id){return document.getElementById(id);}
+var rowIndex={}, rowLayer={};
+LAYERS.forEach(function(L){L.rows.forEach(function(r){rowIndex[r.id]=r;rowLayer[r.id]=L;});});
+var gapIndex={}; GAPS.forEach(function(g){gapIndex[g.id]=g;});
+CELLS.forEach(function(c,i){c.i=i;});
+function srcLabel(s){var k=s.split(" ")[0]; return SRC[k]?SRC[k]+(s.indexOf(" ")>0?" · "+s.slice(s.indexOf(" ")+1):""):s;}
+function sevColor(s){return "var(--g-"+s+")";}
+
+/* ============ RESUMEN ============ */
+function tiles(){
+  var n=CELLS.length, t={N:0,P:0,X:0}, e={E:0,R:0,D:0,Q:0}, g={};
+  CELLS.forEach(function(c){t[c.t]++;e[c.e]++;});
+  GAPS.forEach(function(x){g[x.sev]=(g[x.sev]||0)+1;});
+  function bar(parts){var tot=parts.reduce(function(a,p){return a+p[0];},0)||1;
+    return '<div class="bar" role="img" aria-label="Distribución">'+parts.map(function(p){return '<i style="width:'+(p[0]*100/tot)+'%;background:'+p[1]+'"></i>';}).join("")+'</div>';}
+  var h="";
+  h+='<div class="tile"><h3>Actividades en la matriz</h3><div class="big">'+n+'</div><div class="sub">'+LAYERS[0].rows.length+' actores, '+COLS.length+' etapas</div></div>';
+  h+='<div class="tile"><h3>Por origen</h3><div class="big">'+t.N+' · '+t.P+' · '+t.X+'</div>'+bar([[t.N,"var(--t-norma)"],[t.P,"var(--t-practica)"],[t.X,"var(--t-propuesta)"]])+'<div class="sub">Norma · Práctica · Propuesta</div></div>';
+  h+='<div class="tile"><h3>¿Existe hoy?</h3><div class="big">'+e.E+' · '+e.D+' · '+e.R+' · '+e.Q+'</div>'+bar([[e.E,"var(--e-existe)"],[e.D,"var(--e-nosabe)"],[e.R,"var(--e-noexiste)"],[e.Q,"var(--e-propuesta)"]])+'<div class="sub">Existe · No sabemos · No existe · Propuesta</div></div>';
+  h+='<div class="tile"><h3>Brechas y alertas</h3><div class="big">'+GAPS.length+'</div>'+bar([[g.continuidad||0,"var(--g-continuidad)"],[g.preventivo||0,"var(--g-preventivo)"],[g.aclarar||0,"var(--g-aclarar)"],[g.fortaleza||0,"var(--g-fortaleza)"]])+'<div class="sub">'+(g.continuidad||0)+' de continuidad · '+(g.preventivo||0)+' preventivas · '+(g.aclarar||0)+' por aclarar · '+(g.fortaleza||0)+' fortalezas</div></div>';
+  $("tiles").innerHTML=h;
+}
+
+/* ============ RUTAS ============ */
+var ROUTE_AS=[
+ {w:"Contacto HPM",x:"Tres llamados sin respuesta o número equivocado. La persona queda «no contactado».",g:"La OT pide días y horarios distintos."},
+ {w:"Registro y Contacto HPM",x:"Informan a SSDR el listado de no contactables, una vez al mes antes de la apertura de agenda.",g:"Sin formato ni plazo de respuesta acordados."},
+ {w:"SSDR",x:"Busca datos en RAYEN y Expertos. Si hay dato nuevo, el Contacto HPM cita.",g:""},
+ {w:"SSDR y OIRS",x:"Aviso radial con empresa licitada. La respuesta llega por OIRS o línea 600.",g:"Sin calendario. Medio opcional en la OT."},
+ {w:"SSDR",x:"Visita domiciliaria a quienes no respondieron. Si hay contacto, formulario y cita.",g:"La OT pide certificado de contacto y acuerdo en red."},
+ {w:"Registro HPM",x:"Si no se ubica en el domicilio: egreso en SIGTE por causal 11.",g:"No se ve el aviso de plazo de 30 días a la persona."}
+];
+var ROUTE_TO=[
+ {w:"Contacto HPM",x:"Agota los intentos exigidos, registra cada uno y clasifica el resultado.",g:""},
+ {w:"Referente territorial HPM",x:"Recibe el caso de su territorio y lo deriva con ficha mínima a su contraparte.",g:""},
+ {w:"Contraparte del establecimiento",x:"Busca con medios locales (SOME, equipo de sector, OIRS). Devuelve resultado estandarizado en el plazo acordado.",g:""},
+ {w:"SSDR",x:"Si la búsqueda local no basta, consulta RAYEN, Expertos y la API de Contactabilidad.",g:""},
+ {w:"SSDR con el referente",x:"Medios de mayor costo, aviso radial y visita domiciliaria, según COVICOM, GES y capacidad.",g:""},
+ {w:"Referente y Registro HPM",x:"Vínculo recuperado: el Contacto HPM cita. Si persiste: resolución con verificables o caso vigente.",g:""}
+];
+function routes(){
+  function strip(title,note,arr,cls){
+    var h='<div class="route"><h3>'+title+'</h3><div class="rn">'+note+'</div><div class="steps">';
+    arr.forEach(function(s,i){
+      h+='<div class="step '+cls+'"><div class="card"><div class="n">Paso '+(i+1)+'</div><div class="who">'+esc(s.w)+'</div><div class="what">'+esc(s.x)+'</div>'+(s.g?'<div class="gap">'+esc(s.g)+'</div>':'')+'</div></div>';
+      if(i<arr.length-1)h+='<div class="arrow" aria-hidden="true">→</div>';
+    });
+    return h+'</div></div>';
+  }
+  $("routes").innerHTML=
+   strip("Ruta actual HPM–SSDR","Fuente: flujo de contactabilidad HPM–SSDR y Manual HPM. En naranja, lo que falta frente a la OT.",ROUTE_AS,"as")+
+   strip("Ruta propuesta por referentes","Propuesta para validar. Replica el trabajo de la UGT con un referente por territorio y una contraparte en cada establecimiento.",ROUTE_TO,"to");
+}
+
+
+/* ============ TRAYECTORIA ============ */
+function journey(){
+  var h="";
+  visCols().forEach(function(ci,k,arr){
+    var c=COLS[ci], j=JOURNEY[c.id];
+    h+='<div class="jstep"><div class="card" style="--pc:'+PHASES[c.ph].col+'"><div class="jc">'+c.c+' · '+esc(PHASES[c.ph].t)+'</div><div class="jt">'+esc(c.t)+'</div>'
+     +'<div><div class="k">La persona vive</div>'+esc(j.v)+'</div><div><div class="k">Para qué se contacta</div>'+esc(j.p)+'</div><div><div class="k">Quién lidera</div>'+esc(j.q)+'</div>'
+     +'<button type="button" class="lk" data-col="'+c.id+'">Ver en la matriz</button></div></div>';
+    if(k<arr.length-1)h+='<div class="arrow" aria-hidden="true">→</div>';
+  });
+  $("journey").innerHTML=h;
+}
+
+/* ============ MATRIZ ============ */
+var F={tipo:"todos",est:"todos",q:"",g:false};
+function match(c){
+  if(F.tipo!=="todos"&&c.t!==F.tipo)return false;
+  if(F.est!=="todos"&&c.e!==F.est)return false;
+  if(F.g&&!c.g.length)return false;
+  if(F.q){var hay=(c.x+" "+c.d.map(function(d){return d[0]+" "+d[1];}).join(" ")+" "+rowIndex[c.r].t+" "+COLS[c.c].t).toLowerCase();
+    if(hay.indexOf(F.q.toLowerCase())<0)return false;}
+  return true;
+}
+function matrix(){
+  var vc=visCols(), mx=$("matrix");
+  mx.style.gridTemplateColumns="210px repeat("+vc.length+",minmax(226px,1fr))";
+  mx.style.minWidth=(210+vc.length*226)+"px";
+  var h='<div class="corner">Carril / Etapa</div>';
+  var i0=0;
+  while(i0<vc.length){var ph=COLS[vc[i0]].ph, n=0;while(i0+n<vc.length&&COLS[vc[i0+n]].ph===ph)n++;
+    h+='<div class="phh" style="grid-column:span '+n+';--pc:'+PHASES[ph].col+'" title="'+esc(PHASES[ph].s)+'"><b>'+ph+'</b>'+esc(PHASES[ph].t)+' · '+esc(PHASES[ph].s)+'</div>';i0+=n;}
+  vc.forEach(function(ci){var c=COLS[ci];h+='<div class="colh" id="colh-'+c.id+'"><div class="tc">'+c.c+'</div><div class="tt">'+esc(c.t)+'</div><div class="ts">'+esc(c.s)+'</div></div>';});
+  var shown=0;
+  LAYERS.forEach(function(L){
+    h+='<div class="layer" style="--lc:'+L.col+'"><span>'+esc(L.t)+'</span></div>';
+    L.rows.forEach(function(r){
+      h+='<div class="rowh" style="--lc:'+L.col+'"><div class="rt">'+esc(r.t)+'</div><div class="rs">'+esc(r.s)+'</div>'+(r.flag?'<span class="flag">'+esc(r.flag)+'</span>':'')+'</div>';
+      vc.forEach(function(c){
+        h+='<div class="slot">';
+        CELLS.forEach(function(x){
+          if(x.r===r.id&&x.c===c){
+            var ok=match(x); if(ok)shown++;
+            h+='<button type="button" class="cell t-'+x.t+' e-'+x.e+(ok?'':' dim')+'" data-i="'+x.i+'" id="cell-'+x.i+'">'
+              +'<span>'+esc(x.x)+'</span>'
+              +'<span class="meta"><span class="chip">'+TIPO[x.t]+'</span><span class="badge '+ESTCLS[x.e]+'">'+EST[x.e]+'</span>'
+              +(x.g.length?'<span class="gdots" aria-label="Brechas asociadas">'+x.g.map(function(id){return '<i style="--gc:'+sevColor(gapIndex[id].sev)+'" title="'+esc(gapIndex[id].t)+'"></i>';}).join("")+'</span>':'')
+              +'</span></button>';
+          }
+        });
+        h+='</div>';
+      });
+    });
+  });
+  if(!shown)h+='<div class="empty">Ninguna actividad coincide con los filtros.</div>';
+  $("matrix").innerHTML=h;
+}
+
+/* ============ FICHA ============ */
+var lastFocus=null;
+function openCell(i){
+  var c=CELLS[i], r=rowIndex[c.r];
+  $("ficha-k").textContent="Ficha operacional · "+COLS[c.c].c;
+  $("ficha-t").textContent=r.t+" · "+COLS[c.c].t;
+  var h='';
+  h+='<div><div class="k">Actividad</div><div class="v">'+esc(c.x)+'</div></div>';
+  h+='<div class="row2"><div><div class="k">Origen</div><div class="v">'+TIPO[c.t]+'</div></div><div><div class="k">¿Existe hoy?</div><div class="v"><span class="badge '+ESTCLS[c.e]+' e-'+c.e+'">'+EST[c.e]+'</span></div></div></div>';
+  h+='<div class="row2"><div><div class="k">Carril</div><div class="v">'+esc(r.t)+'</div></div><div><div class="k">Etapa</div><div class="v">'+COLS[c.c].c+' · '+esc(COLS[c.c].t)+'</div></div></div>';
+  c.d.forEach(function(d){h+='<div class="dl"><div class="k">'+esc(d[0])+'</div><div class="v">'+esc(d[1])+'</div></div>';});
+  h+='<div><div class="k">Fuentes</div>'+c.s.map(function(s){return '<div class="v src">'+esc(srcLabel(s))+'</div>';}).join("")+'</div>';
+  if(c.g.length){h+='<div><div class="k">Brechas asociadas</div>'+c.g.map(function(id){var g=gapIndex[id];return '<div class="fgap" style="--gc:'+sevColor(g.sev)+'"><b>'+id+' · '+esc(g.t)+'</b><div class="src">'+SEV[g.sev]+'</div></div>';}).join("")+'</div>';}
+  $("ficha-b").innerHTML=h;
+  $("ficha").classList.add("open");$("ficha").setAttribute("aria-hidden","false");$("scrim").classList.add("on");
+  $("ficha-x").focus();
+}
+function closeFicha(){
+  $("ficha").classList.remove("open");$("ficha").setAttribute("aria-hidden","true");$("scrim").classList.remove("on");
+  if(lastFocus&&lastFocus.focus)lastFocus.focus();
+}
+
+/* ============ BRECHAS ============ */
+function gapCells(id){return CELLS.filter(function(c){return c.g.indexOf(id)>=0;});}
+function gaps(){
+  var mode=$("g-sort").value, list=GAPS.slice();
+  function firstCol(g){var cs=gapCells(g.id);return cs.length?Math.min.apply(null,cs.map(function(c){return c.c;})):99;}
+  function firstRow(g){var cs=gapCells(g.id);var order=[];LAYERS.forEach(function(L){L.rows.forEach(function(r){order.push(r.id);});});return cs.length?Math.min.apply(null,cs.map(function(c){return order.indexOf(c.r);})):99;}
+  if(mode==="sev")list.sort(function(a,b){return SEVORD[a.sev]-SEVORD[b.sev]||parseInt(a.id.slice(1))-parseInt(b.id.slice(1));});
+  if(mode==="etapa")list.sort(function(a,b){return firstCol(a)-firstCol(b);});
+  if(mode==="actor")list.sort(function(a,b){return firstRow(a)-firstRow(b);});
+  $("gaps").innerHTML=list.map(function(g){
+    var cs=gapCells(g.id);
+    return '<article class="gap-card" style="--gc:'+sevColor(g.sev)+'"><div class="gh"><span class="gs">'+SEV[g.sev]+'</span><span class="gid">'+g.id+'</span></div>'
+     +'<h3>'+esc(g.t)+'</h3><p>'+esc(g.x)+'</p>'
+     +'<div class="src">'+g.s.map(function(s){return esc(s);}).join(" · ")+'</div>'
+     +(cs.length?'<div class="links">'+cs.map(function(c){return '<button type="button" class="lk" data-go="'+c.i+'">'+COLS[c.c].c+' · '+esc(rowIndex[c.r].t.split(" ").slice(0,3).join(" "))+'</button>';}).join("")+'</div>':'')
+     +'</article>';
+  }).join("");
+}
+
+/* ============ OTROS BLOQUES ============ */
+function decs(){$("decs").innerHTML=DECS.map(function(d){return '<li>'+esc(d)+'</li>';}).join("");}
+function srcs(){$("srcs").innerHTML=Object.keys(SRC).map(function(k){return '<div><b>'+k+'</b>'+esc(SRC[k])+'</div>';}).join("");}
+
+/* ============ EVENTOS ============ */
+function bind(){
+  $("matrix").addEventListener("click",function(e){var b=e.target.closest(".cell");if(b){lastFocus=b;openCell(+b.getAttribute("data-i"));}});
+  $("ficha-x").addEventListener("click",closeFicha);
+  $("scrim").addEventListener("click",closeFicha);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeFicha();});
+  $("f-tipo").addEventListener("change",function(){F.tipo=this.value;matrix();});
+  $("f-est").addEventListener("change",function(){F.est=this.value;matrix();});
+  $("f-q").addEventListener("input",function(){F.q=this.value.trim();matrix();});
+  $("f-g").addEventListener("change",function(){F.g=this.checked;matrix();});
+  $("f-clear").addEventListener("click",function(){F={tipo:"todos",est:"todos",q:"",g:false};$("f-tipo").value="todos";$("f-est").value="todos";$("f-q").value="";$("f-g").checked=false;matrix();});
+  $("g-sort").addEventListener("change",gaps);
+  $("f-scope").addEventListener("change",function(){SCOPE=this.value;journey();matrix();});
+  $("journey").addEventListener("click",function(e){var b=e.target.closest("[data-col]");if(!b)return;var el=$("colh-"+b.getAttribute("data-col"));if(el){el.scrollIntoView({block:"nearest",inline:"center"});$("matriz-sec").scrollIntoView({block:"start"});}});
+  $("gaps").addEventListener("click",function(e){
+    var b=e.target.closest("[data-go]");if(!b)return;
+    var i=+b.getAttribute("data-go");
+    F={tipo:"todos",est:"todos",q:"",g:false};$("f-tipo").value="todos";$("f-est").value="todos";$("f-q").value="";$("f-g").checked=false;
+    if(visCols().indexOf(CELLS[i].c)<0){SCOPE="full";$("f-scope").value="full";journey();}
+    matrix();
+    var el=$("cell-"+i);if(el){el.scrollIntoView({block:"center",inline:"center"});el.classList.add("hl");setTimeout(function(){el.classList.remove("hl");},2200);lastFocus=el;openCell(i);}
+  });
+}
+
+tiles();routes();journey();matrix();gaps();decs();srcs();bind();
+</script>
+</body>
+</html>
