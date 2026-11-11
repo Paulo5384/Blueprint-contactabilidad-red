@@ -109,6 +109,20 @@ input[type=search]{min-width:220px}
 .jstep .jt{font-weight:600;font-size:13px}
 .jstep .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
 .jstep .lk{align-self:flex-start;margin-top:auto}
+details.sec{display:flex;flex-direction:column;gap:10px}
+details.sec>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary h2{font-size:18px;font-weight:600}
+details.sec>summary:before{content:"▸";color:var(--muted)}
+details.sec[open]>summary:before{content:"▾"}
+details.sec>*:not(summary){margin-top:10px}
+.cnt{font-size:12px;font-weight:500;color:var(--muted);font-family:var(--mono)}
+.gaps{align-items:start}
+.gap-card summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.gap-card summary::-webkit-details-marker{display:none}
+.gap-card summary h3:before{content:"▸ ";color:var(--muted)}
+.gap-card[open] summary h3:before{content:"▾ "}
+.gap-card .gbody{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .cycle{background:var(--surface);border:1px dashed var(--t-propuesta);border-radius:8px;padding:10px 12px;font-size:13px}
 .colh .tc{font-family:var(--mono);font-size:11px;color:var(--accent)}
 .colh .tt{font-weight:600;font-size:13px}
@@ -182,19 +196,13 @@ aside#ficha.open{transform:none}
 <div class="wrap">
 
 <header class="top">
-  <div class="eyebrow">Servicio de Salud del Reloncaví · Hospital Puerto Montt · Blueprint V0.2</div>
+  <div class="eyebrow">Servicio de Salud del Reloncaví · Hospital Puerto Montt · Blueprint V0.3</div>
   <h1>Blueprint de Contactabilidad en Red</h1>
-  <p class="lead">El proceso de contactabilidad visto como trayectoria de la persona: desde su centro de origen hasta la continuidad del cuidado después de la primera consulta de especialidad, repartido por carriles de responsabilidad. Cada celda dice de dónde viene (norma, práctica actual o propuesta) y si existe hoy. El escalamiento de la no contactabilidad se organiza por pares de referentes: uno territorial en el HPM y su contraparte en cada establecimiento.</p>
+  <p class="lead">El proceso de contactabilidad visto como trayectoria de la persona: desde su centro de origen hasta la continuidad del cuidado después de la primera consulta de especialidad, repartido por carriles de responsabilidad. Cada celda dice de dónde viene (norma, práctica actual o propuesta) y si existe hoy. La gestión de la no contactabilidad es un subproceso más. Se organiza con el Centro de Contacto HPM como equipo referente y una contraparte en cada establecimiento de origen.</p>
   <div class="warn"><b>Documento de trabajo para validar con la mesa.</b> No es un procedimiento aprobado por la red. Donde dice «Norma» es lo que fija la Orientación Técnica del MINSAL. «Práctica» es lo que hoy describen el Manual HPM, el flujo HPM–SSDR, el Acta y los protocolos de Navegadores. «Propuesta» es nuevo y se discute. Las celdas con «No sabemos» son las que hay que marcar en la mesa.</div>
 </header>
 
 <div class="tiles" id="tiles" aria-label="Resumen"></div>
-
-<section class="block">
-  <h2>Cómo se escala hoy una persona no contactable, y cómo podría escalarse</h2>
-  <p class="note">Arriba, la ruta que describe el flujo HPM–SSDR. Abajo, la propuesta: replicar en toda la red el trabajo por referentes de la UGT, con una contraparte designada en cada establecimiento. Los pasos van de menor a mayor costo, como pide la OT.</p>
-  <div class="routes" id="routes"></div>
-</section>
 
 <section class="block" id="trayectoria-sec">
   <h2>La trayectoria vista desde la persona</h2>
@@ -210,7 +218,7 @@ aside#ficha.open{transform:none}
 <section class="block" id="matriz-sec">
   <h2>Matriz por carriles y etapas</h2>
   <div class="toolbar">
-    <div class="fld"><label for="f-tipo">Origen</label>
+    <div class="fld"><label for="f-tipo">Tipo de contenido</label>
       <select id="f-tipo"><option value="todos">Todos</option><option value="N">Norma</option><option value="P">Práctica actual</option><option value="X">Propuesta</option></select></div>
     <div class="fld"><label for="f-est">¿Existe hoy?</label>
       <select id="f-est"><option value="todos">Todos los estados</option><option value="E">Existe</option><option value="R">No existe</option><option value="D">No sabemos</option><option value="Q">Es una propuesta</option></select></div>
@@ -234,19 +242,27 @@ aside#ficha.open{transform:none}
   <div class="matrixbox" tabindex="0" aria-label="Matriz de carriles por etapas, desplazable"><div class="matrix" id="matrix"></div></div>
 </section>
 
-<section class="block" id="brechas-sec">
-  <h2>Brechas y alertas</h2>
+<section class="block">
+  <h2>Subproceso de no contactabilidad: cómo se escala hoy y cómo podría escalarse</h2>
+  <p class="note">Arriba, la ruta que describe el flujo HPM–SSDR. Abajo, la propuesta: el Centro de Contacto HPM es el equipo referente y se comunica con una contraparte designada en cada establecimiento de origen, inspirado en el trabajo de la UGT. El SSDR se mantiene informado. Los pasos van de menor a mayor costo, como pide la OT.</p>
+  <div class="routes" id="routes"></div>
+</section>
+
+<details class="sec" id="brechas-sec" open>
+  <summary><h2>Brechas y alertas <span class="cnt" id="gcount"></span></h2></summary>
   <div class="toolbar">
     <div class="fld"><label for="g-sort">Ordenar por</label>
       <select id="g-sort"><option value="sev">Gravedad</option><option value="etapa">Etapa del proceso</option><option value="actor">Carril</option></select></div>
+    <button class="btn" id="g-open" type="button">Expandir todo</button>
+    <button class="btn" id="g-close" type="button">Contraer todo</button>
   </div>
   <div class="gaps" id="gaps"></div>
-</section>
+</details>
 
-<section class="block">
-  <h2>Decisiones que debe tomar la mesa</h2>
+<details class="sec" id="decs-sec" open>
+  <summary><h2>Decisiones que debe tomar la mesa <span class="cnt" id="dcount"></span></h2></summary>
   <ol class="decs" id="decs"></ol>
-</section>
+</details>
 
 <section class="block">
   <h2>Fuentes</h2>
@@ -280,6 +296,8 @@ var SRC={
   MIN:"Minuta de Trabajo N°1, 23-07-2026",
   DIR:"Directriz de P. Muñoz sobre el modelo de referentes y la trayectoria completa, 10-11-2026",
   DM:"Documento maestro de contexto (síntesis previa, sin contraste con fuente primaria)",
+  RUR:"Tabla N°2, clasificación operativa de los establecimientos de la Red del SSDR según comuna y ruralidad, presentada en la mesa (foto del 11-11-2026)",
+  VD:"Flujograma de gestión de visita domiciliaria, lista de espera, presentado en la mesa (foto del 11-11-2026)",
   PRO:"Propuesta de este trabajo, para validar"
 };
 
@@ -293,7 +311,7 @@ var COLS=[
  {id:"o1",ph:"O",c:"O1",t:"Primera atención en el origen",s:"Acceso a la consulta que gatilla la derivación"},
  {id:"o2",ph:"O",c:"O2",t:"Indicación, derivación y datos",s:"SIC u OA, datos de contacto, COVICOM"},
  {id:"h1",ph:"H",c:"H1",t:"Vinculación",s:"Primer contacto y validación de datos"},
- {id:"h2",ph:"H",c:"H2",t:"Monitoreo y espera",s:"Seguimiento y gestión de barreras"},
+ {id:"h2",ph:"H",c:"H2",t:"Acompañamiento y espera",s:"Acompañamiento y gestión de barreras"},
  {id:"h3",ph:"H",c:"H3",t:"Agenda y citación",s:"Apertura de agenda y citación"},
  {id:"h4",ph:"H",c:"H4",t:"Confirmación",s:"Confirmación y recordatorio"},
  {id:"h5",ph:"H",c:"H5",t:"Atención, NSP y bloqueos",s:"Reagendamiento y no presentación"},
@@ -309,23 +327,22 @@ var JOURNEY={
  o1:{v:"Consulta en su centro de salud por un problema que no se resuelve ahí. El establecimiento la llama y la cita.",p:"Que llegue a la consulta que decide si necesita un especialista.",q:"Establecimiento de origen. Hipótesis por levantar."},
  o2:{v:"El equipo le indica una interconsulta u OA, le pide un número vigente y, si corresponde, firma el COVICOM.",p:"Dejar datos verificados y un compromiso de comunicación antes de que empiece la espera.",q:"Establecimiento de origen. Registro HPM evalúa la pertinencia."},
  h1:{v:"Recibe un primer llamado o mensaje que confirma si aún necesita la atención.",p:"Validar datos y necesidad.",q:"Contacto HPM. Navegadores en casos priorizados."},
- h2:{v:"Espera. Puede recibir contactos de seguimiento y ayuda con barreras para asistir.",p:"Que la espera no rompa el vínculo.",q:"Navegadores y referente con su contraparte. El Manual no lo describe."},
+ h2:{v:"Espera. Puede recibir contactos de seguimiento y ayuda con barreras para asistir.",p:"Que la espera no rompa el vínculo.",q:"Navegadores y UGT con la contraparte de cada territorio. El Manual no lo describe."},
  h3:{v:"Le ofrecen fecha, hora, profesional y lugar.",p:"Convertir la espera en una cita.",q:"Contacto HPM, con CAE y Registro."},
  h4:{v:"Confirma o anula la cita. Recibe un recordatorio.",p:"Proteger el cupo.",q:"Contacto HPM."},
  h5:{v:"Asiste a la consulta, no se presenta, o su hora se bloquea y la reagendan.",p:"Que la atención ocurra o se reprograme sin perderla.",q:"CAE y Contacto HPM."},
  p1:{v:"Recibe indicaciones y, en algunos casos, un llamado para saber si las entendió.",p:"Comprensión de lo indicado y próximos pasos.",q:"Navegadores en sus especialidades. En el resto, sin definir."},
  p2:{v:"Vuelve a su territorio con alta, control o nuevos exámenes.",p:"Continuidad del cuidado, más allá de la primera consulta.",q:"CAE, establecimiento de origen y Continuidad de la Atención del SSDR."},
- x1:{v:"No responde. Alguien la busca con medios cada vez más costosos.",p:"Recuperar el vínculo.",q:"Referente HPM con su contraparte, y SSDR."},
- x2:{v:"Recupera su cita, o queda egresada, exceptuada o con caso vigente, con respaldo.",p:"Cierre trazable.",q:"Registro HPM, referente y SSDR."}
+ x1:{v:"No responde. Alguien la busca con medios cada vez más costosos.",p:"Recuperar el vínculo.",q:"Centro de Contacto HPM con la contraparte del establecimiento. El SSDR se mantiene informado."},
+ x2:{v:"Recupera su cita, o queda egresada, exceptuada o con caso vigente, con respaldo.",p:"Cierre trazable.",q:"Registro HPM y Centro de Contacto. El SSDR recibe la información."}
 };
 
 var LAYERS=[
  {id:"A",t:"Actores y responsabilidad primaria",col:"var(--l-actor)",rows:[
   {id:"per",t:"Persona usuaria y red de apoyo",s:"Familiar, cuidador o contacto alternativo autorizado"},
-  {id:"est",t:"Referente de contactabilidad del establecimiento",s:"Contraparte territorial: SOME u otra persona designada; OIRS y equipos de sector"},
-  {id:"ref",t:"Referente territorial HPM",s:"Par de la contraparte. Hoy lo cumple la UGT en sus territorios"},
+  {id:"est",t:"Referente de contactabilidad del establecimiento",s:"Contraparte del Centro de Contacto: SOME u otra persona designada; OIRS y equipos de sector"},
   {id:"reg",t:"Registro y Gestión de Demanda HPM",s:"Lista de espera y SIGTE"},
-  {id:"cc",t:"Contacto HPM",s:"Centro de Contacto de Pacientes y unidades citadoras",flag:"Estructura en revisión"},
+  {id:"cc",t:"Centro de Contacto HPM (equipo referente)",s:"Equipo referente de contactabilidad del hospital. Se comunica con la contraparte de cada establecimiento de origen y con las unidades citadoras",flag:"Estructura en revisión"},
   {id:"cae",t:"CAE y unidades clínicas HPM",s:"Agendas, bloqueos y atención"},
   {id:"nav",t:"UGT y Navegadores en Red",s:"Casos priorizados y acompañamiento"},
   {id:"ssdr",t:"Servicio de Salud del Reloncaví",s:"Contactabilidad y Continuidad de la Atención"}
@@ -365,8 +382,8 @@ C("regi",2,"P","E","Registro íntegro en los sistemas institucionales: resultado
 /* ---- T2 Monitoreo ---- */
 C("per",3,"N","D","Mantiene comunicación en ambos sentidos: dudas, cambios en su salud y barreras para asistir.",["OT §5.3"]);
 C("est",3,"X","Q","Detecta barreras territoriales y mantiene al día los datos de las personas de su comuna que esperan atención.",["ACT","DIR"],{g:["G19"]});
-C("ref",3,"P","E","Mantiene contacto permanente con su contraparte territorial y trabaja con planillas compartidas: controles atrasados, horas y exámenes.",["MIN","DIR"],{g:["G16","G18"],d:[["Hoy","La UGT tiene un referente por territorio: provincia de Palena, comuna de Cochamó y algunas islas de Calbuco. Cada referente tiene una contraparte en el establecimiento."],["Alcance","Esta práctica es la base del modelo propuesto para la contactabilidad en toda la red."]]});
-C("cc",3,"N","R","El Manual HPM no incluye protocolo de monitoreo y seguimiento, que la OT define como un subproceso.",["OT §5.3","MAN"],{g:["G3"]});
+C("nav",3,"P","E","La UGT mantiene contacto permanente con la contraparte de cada territorio y trabaja con planillas compartidas: controles atrasados, horas y exámenes.",["MIN","DIR"],{g:["G16"],d:[["Hoy","La UGT tiene un referente por territorio: provincia de Palena, comuna de Cochamó y algunas islas de Calbuco. Cada referente tiene una contraparte en el establecimiento."],["Alcance","Es la práctica que inspira el modelo de contactabilidad. El nombre «referente territorial» es de la UGT y no se usa para este proceso."]]});
+C("cc",3,"N","R","El Manual HPM no incluye un protocolo para esta etapa. La OT la define como el subproceso de «monitoreo y seguimiento»; aquí se llama acompañamiento.",["OT §5.3","MAN"],{g:["G3"]});
 C("nav",3,"P","E","Acompaña de forma activa: contacto permanente, barreras y estados de caso (gestión activa, en proceso, post atención, cierre).",["NAV","MIN"],{d:[["UGT","Gestiona controles atrasados de territorios priorizados y coordina horas, controles y exámenes con los referentes territoriales."]]});
 C("canal",3,"N","D","Usa el canal bidireccional que la persona declara y prioriza por antigüedad, estratificación, edad u otros criterios locales.",["OT §5.3"]);
 C("regi",3,"N","D","Registra el motivo «monitoreo y seguimiento» y el plan de gestión de la espera según riesgo.",["OT §5.3"]);
@@ -405,18 +422,19 @@ C("canal",7,"N","D","Seguimiento por llamada, mensajería o correo, con medició
 /* ---- T7 No contactabilidad ---- */
 C("per",9,"N","D","Puede responder por cualquier canal, el portal, la línea 600 o la OIRS, dentro del plazo de 30 días que se le informa.",["OT §8","FLU"]);
 C("est",9,"P","E","La OIRS recibe el listado del aviso radial, recibe las respuestas y actualiza datos en RAYEN y Expertos.",["FLU"],{g:["G9","G17"],d:[["Hoy","La coordinación con SOME, OIRS y otros actores depende en parte de contactos informales entre funcionarios."]]});
-C("est",9,"X","Q","Recibe del referente territorial HPM la solicitud con ficha mínima, busca a la persona con medios locales y devuelve un resultado estandarizado.",["DIR","PRO"],{g:["G9","G19"],d:[["Medios locales","SOME, equipo de sector, OIRS, visita del establecimiento, según capacidad."],["Resguardo","No comparte información clínica con agentes comunitarios ni la expone en medios abiertos (OT §8)."],["Por acordar","Ficha mínima, plazo de respuesta, formato del resultado y quién subroga a la contraparte."]]});
-C("ref",9,"X","Q","Recibe del Contacto HPM los casos no contactables de su territorio, los deriva a su contraparte con ficha mínima y vigila plazo y devolución.",["DIR","PRO"],{g:["G18","G19"],d:[["Por qué","Da una puerta de entrada conocida en cada establecimiento. Reemplaza los contactos informales por un vínculo directo y trazable."],["Ficha mínima","Identificación, motivo, gestiones ya hechas con fecha y canal, y resultado esperado. Sin datos clínicos."],["Por acordar","Plazo de respuesta, formato de devolución y qué hace el referente cuando no hay respuesta."]]});
+C("est",9,"X","Q","Recibe del Centro de Contacto HPM la solicitud con ficha mínima, busca a la persona con medios locales y devuelve un resultado estandarizado.",["DIR","PRO"],{g:["G9","G19"],d:[["Medios locales","SOME, equipo de sector, OIRS, visita del establecimiento, según capacidad."],["Resguardo","No comparte información clínica con agentes comunitarios ni la expone en medios abiertos (OT §8)."],["Por acordar","Ficha mínima, plazo de respuesta, formato del resultado y quién subroga a la contraparte."]]});
+C("cc",9,"X","Q","Como equipo referente del hospital, recibe los casos no contactables, se comunica con su contraparte en el establecimiento de origen, le deriva el caso con ficha mínima y vigila plazo y devolución.",["DIR","PRO"],{g:["G18","G19"],d:[["Por qué","Da una puerta de entrada conocida en cada establecimiento. Reemplaza los contactos informales por un vínculo directo y trazable."],["Ficha mínima","Identificación, motivo, gestiones ya hechas con fecha y canal, y resultado esperado. Sin datos clínicos."],["Por acordar","Plazo de respuesta, formato de devolución y qué hace el equipo cuando no hay respuesta."]]});
 C("reg",9,"P","E","Informa a SSDR el listado de personas no contactables y recibe el listado devuelto con el nuevo estado.",["FLU"]);
 C("cc",9,"P","E","Registra «no contactado», cita a quienes SSDR ubica y revisa atenciones en la red 2 meses antes y 2 después del aviso radial.",["MAN §5","FLU"],{g:["G1","G7"],d:[["Por confirmar","El flujo menciona prioridad en usuarios COMGES. Es una lectura obtenida por OCR del esquema; confirmar con A. Leiva."]]});
 C("nav",9,"P","E","Mantiene en gestión activa a quien no pudo contactar y recibe solo los casos que cumplen criterios de ingreso y capacidad.",["NAV","DM"]);
 C("ssdr",9,"P","E","Busca datos de contacto en RAYEN y Expertos y marca a la persona como «NO CONTACTABLE» en el monitoreo.",["FLU"]);
-C("ssdr",9,"P","E","Envía el listado a aviso radial (empresa licitada) y a las OIRS de cada establecimiento.",["FLU"],{g:["G5","G17"],d:[["Hoy","Sin calendario de avisos. Según el flujo, respondían solo Chaitén y Fresia. Se evalúa mantener la estrategia para toda la red."]]});
-C("ssdr",9,"P","E","Realiza visita domiciliaria a quienes no respondieron al aviso radial.",["FLU"],{g:["G6","G11"]});
-C("ssdr",9,"X","Q","Coordina la red de referentes, resuelve lo que un establecimiento no puede hacer y supervisa plazos y devoluciones.",["ACT","DIR"],{g:["G9"],d:[["Base","El Acta acuerda definir responsables de contactabilidad en cada establecimiento y mecanismos de coordinación y retroalimentación."]]});
+C("ssdr",9,"P","E","Envía el listado a aviso radial (empresa licitada) y a las OIRS de cada establecimiento.",["FLU","RUR"],{g:["G5","G17"],d:[["Hoy","Sin calendario de avisos. Según el flujo, respondían solo Chaitén y Fresia. La mesa define ahora aplicarlo en los establecimientos catalogados como rurales (Tabla N°2 de ruralidad)."]]});
+C("ssdr",9,"P","E","Realiza visita domiciliaria a quienes no respondieron al aviso radial.",["FLU","VD"],{g:["G6","G11"],d:[["Si está en el domicilio","Se le entrega o informa la cita ya asignada, con los detalles de la prestación, y se verifica un número de contacto actualizado para registrarlo en RAYEN."],["Domicilio inexistente o ya no reside","Se verifica la situación, se registra como no contactable con respaldo y se deja el registro de la gestión con los antecedentes que fundamentan la imposibilidad de contacto."],["Sin moradores","No se deja citación ni hora. Se deja una notificación escrita con 30 días corridos para acercarse al establecimiento y actualizar datos."],["Registro","Fecha de la visita, resultado y observaciones con respaldo, en el sistema (por ejemplo RAYEN)."]]});
+C("est",9,"P","D","Cuando la visita no encuentra moradores, la notificación escrita la crea el establecimiento y lleva sus sellos institucionales.",["VD"],{g:["G6"],d:[["Contenido","Solo el nombre de la persona: sin RUT ni antecedentes clínicos. Indica el plazo de 30 días corridos para acercarse y actualizar datos. Si no, se procede al egreso de la lista de espera según los procedimientos."],["Por confirmar","El flujograma se presentó en la mesa. Falta confirmar si es un documento oficial (MINSAL o SSDR) y quién ejecuta la visita en la red."]]});
+C("ssdr",9,"X","Q","Toma conocimiento: su referente de contactabilidad y el equipo dedicado reciben la información de casos, plazos y devoluciones. En la propuesta no ejecuta pasos del escalamiento.",["ACT","DIR"],{g:["G9"],d:[["Base","El Acta acuerda definir responsables de contactabilidad en cada establecimiento y mecanismos de coordinación y retroalimentación."],["Por definir","Qué informe recibe, con qué frecuencia y si conserva algún rol de apoyo para lo que un establecimiento no puede resolver."]]});
 C("canal",9,"N","D","Con COVICOM: 2 correos y 2 mensajes en un mes (separados al menos una semana), 3 llamadas a todos los números en días y horarios distintos, una fuera de horario hábil, y aviso en el Portal Paciente por 30 días.",["OT §8.1"],{g:["G1","G2","G12"],d:[["GES","La frecuencia depende del plazo de la garantía de oportunidad."],["Contenido","Por correo y mensaje no se comparte información sensible; se incluye el enlace al portal."]]});
 C("canal",9,"N","D","Sin COVICOM, y siempre en GES: lo anterior más visita domiciliaria o carta certificada. La carta no sirve en GES por sus plazos.",["OT §8.2"],{g:["G11"],d:[["Visita","Funcionario, consejo de desarrollo local o empresa autorizada. Requiere certificado de contacto con identificación, dirección, día, hora y firma."],["Acuerdo en red","Para ejecutarla se requieren acuerdos firmados por resoluciones locales que designen responsables."]]});
-C("canal",9,"N","E","Opcionales: aviso radial (3 llamados, uno fuera de horario hábil, con grabación), redes sociales, campañas y organizaciones comunitarias. Redes y campañas no validan egresos.",["OT §8.1","OT §8"],{d:[["Radial","Sirve sobre todo en ruralidad y zonas de difícil acceso. En agendas, con citación extraordinaria, puede validar una causal de egreso."],["Comunitarias","Pueden facilitar la búsqueda, pero no son un medio válido para respaldar una salida de registro."]]});
+C("canal",9,"N","E","Opcionales: aviso radial (3 llamados, uno fuera de horario hábil, con grabación), redes sociales, campañas y organizaciones comunitarias. Redes y campañas no validan egresos.",["OT §8.1","OT §8"],{d:[["Radial","Sirve sobre todo en ruralidad y zonas de difícil acceso. En agendas, con citación extraordinaria, puede validar una causal de egreso."],["En la mesa","Hoy se está definiendo que el aviso radial se haga en los establecimientos catalogados como rurales (Tabla N°2 de ruralidad)."],["Comunitarias","Pueden facilitar la búsqueda, pero no son un medio válido para respaldar una salida de registro."]]});
 C("plazo",9,"N","D","30 días corridos sin contacto. Con COVICOM, desde el inicio del proceso. Sin COVICOM, desde el inicio del segundo proceso (visita o carta). Cumplido el plazo, se egresa en no GES.",["OT §8.1","OT §8.2"],{g:["G2"],d:[["Carta certificada","Los 30 días parten de la entrega, respaldada por quien distribuye la carta."]]});
 C("sis",9,"N","D","Portal Paciente (canal abierto y permanente que exige la OT), RAYEN, Expertos, SIGTE y API de Contactabilidad del MINSAL.",["OT §8","ACT"],{g:["G12"]});
 C("regi",9,"N","D","Cada intento queda con canal, fecha, hora, receptor y resultado. Llamadas externas con grabación. Visita con certificado de contacto firmado.",["OT §3.1","OT §8.2"]);
@@ -424,7 +442,7 @@ C("regi",9,"N","D","Cada intento queda con canal, fecha, hora, receptor y result
 /* ---- T8 Salida y cierre ---- */
 C("per",10,"N","D","Si se recupera el vínculo, actualiza sus datos y COVICOM y acuerda nueva hora. Si no, queda egresada, exceptuada o con garantía cerrada, con respaldo.",["OT §8.1","OT §7"]);
 C("est",10,"P","D","Si la persona ya no necesita la atención, hace el rechazo desde el establecimiento de origen.",["FLU"]);
-C("ref",10,"X","Q","Recibe el resultado de su contraparte, lo entrega al Contacto HPM o a Registro y verifica quién retoma la citación (circuito cerrado).",["DIR","PRO"],{g:["G4"],d:[["Por qué","No basta con que el establecimiento informe un número nuevo. Debe haber devolución verificable y una acción posterior definida."]]});
+C("cc",10,"X","Q","Recibe el resultado de su contraparte, lo entrega a Registro y a las unidades citadoras y verifica quién retoma la citación (circuito cerrado).",["DIR","PRO"],{g:["G4"],d:[["Por qué","No basta con que el establecimiento informe un número nuevo. Debe haber devolución verificable y una acción posterior definida."]]});
 C("reg",10,"P","E","Egresa en SIGTE por causal 11 tras el aviso radial y la visita sin resultado, con el formulario o voucher de respaldo.",["FLU"],{g:["G8"],d:[["Respaldo","El flujo indica subir el formulario o voucher a poli digital."]]});
 C("cc",10,"P","D","Retoma la citación de las personas ubicadas. La devolución debe traer ID y los números donde hubo contacto efectivo.",["FLU"]);
 C("nav",10,"P","E","Cierra su gestión cuando la persona egresa o termina la gestión. No continúa el acompañamiento.",["NAV"]);
@@ -441,14 +459,14 @@ C("canal",0,"N","D","La OT cubre mediana y alta complejidad. Sus principios (len
 C("sis",0,"P","D","Cada establecimiento usa su propio sistema local. Se desconoce cómo registra los intentos y resultados de contacto antes de derivar.",["DIR"],{g:["G20"]});
 C("regi",0,"X","Q","Dejar registrado el contacto efectivo y los datos verificados en la primera atención, para que viajen con la SIC (conjunto mínimo N°820).",["OT §7.3","PRO"],{g:["G20"]});
 
-/* ---- O2: referente HPM ---- */
-C("ref",1,"X","Q","Acuerda con su contraparte qué datos de contacto viajan en la SIC y cómo se corrigen cuando cambian.",["DIR","PRO"],{g:["G8"]});
+/* ---- O2: Centro de Contacto ---- */
+C("cc",1,"X","Q","Acuerda con su contraparte en el establecimiento qué datos de contacto viajan en la SIC y cómo se corrigen cuando cambian.",["DIR","PRO"],{g:["G8"]});
 
 /* ---- P2 Contrarreferencia y continuidad ---- */
 C("est",8,"X","Q","Actualiza los datos de contacto de la persona en cada control y avisa al HPM cuando cambian.",["DIR","PRO"],{g:["G8"]});
 C("cae",8,"P","D","Define alta, controles o contrarreferencia y la registra para que llegue al establecimiento de origen.",["DM"],{d:[["Detalle","Está en el Blueprint de Contrarreferencia y Transición Asistencial HPM-APS, que cita el ORD N°2301 y la Res. Exenta N°6041-2025. Verificar allí."]]});
 C("nav",8,"P","D","Verifica que la persona tenga definida una siguiente acción asistencial (control, examen, alta o contrarreferencia) antes de cerrar su gestión.",["NAV"],{g:["G21"],d:[["Alcance hoy","Solo en las tres especialidades de Navegadores. El criterio de cierre no se ha confirmado con el protocolo."]]});
-C("ref",8,"X","Q","Cuando la persona vuelve a su territorio, verifica con su contraparte que retomó el control y que los datos de contacto quedaron al día.",["DIR","PRO"],{g:["G21"]});
+C("cc",8,"X","Q","Cuando la persona vuelve a su territorio, verifica con su contraparte que retomó el control y que los datos de contacto quedaron al día.",["DIR","PRO"],{g:["G21"]});
 C("ssdr",8,"P","D","El referente de Continuidad de la Atención articula el nivel hospitalario con el primario.",["DM"],{d:[["Por confirmar","Viene del documento maestro, sin contraste con fuente primaria."]]});
 C("canal",8,"X","Q","Lo que sigue a la atención (nuevo control, examen, otra especialidad) abre un nuevo ciclo: la persona vuelve a entrar desde la indicación.",["OT §5.5","PRO"],{g:["G21"]});
 C("plazo",8,"X","Q","Los plazos de la contrarreferencia están en su propio blueprint. Aquí falta fijar quién vigila que se cumplan en las personas que estuvieron en espera.",["PRO"],{g:["G21"]});
@@ -460,7 +478,7 @@ var GAPS=[
  {id:"G2",sev:"preventivo",t:"COVICOM y los dos flujos de no contactabilidad no están en el Manual",x:"El Manual HPM no menciona el COVICOM ni los plazos de 30 días, ni la diferencia entre el flujo con y sin COVICOM. El Acta informa que la implementación del COVICOM está en avance, sin cobertura documentada. De esa cobertura depende qué flujo se aplica a cada persona.",s:["MAN","OT §6","OT §8","ACT"]},
  {id:"G3",sev:"preventivo",t:"El Manual cubre 4 de los 9 hitos desde la derivación",x:"Cubre vinculación, citación, confirmación y bloqueo con reagendamiento. No describe monitoreo y seguimiento, NSP, post atención ni la gestión de no contactabilidad, que la OT trata como subprocesos o capítulos propios. Tampoco toca el origen ni la contrarreferencia.",s:["MAN","OT §5","OT §8"]},
  {id:"G4",sev:"continuidad",t:"La devolución al HPM es mensual y sin retroalimentación",x:"Las devoluciones de campañas se acordaron una vez al mes, antes de la apertura de agenda. El año pasado hubo 2 y no hubo retroalimentación en todo el año. Una persona ubicada puede quedar sin cita porque nadie retoma el caso. La devolución debería traer ID y números con contacto efectivo.",s:["FLU"]},
- {id:"G5",sev:"preventivo",t:"El aviso radial no tiene calendario y su efecto es acotado",x:"Falta un calendario de avisos para trabajar barridos trimestrales. Según el flujo, respondían solo Chaitén y Fresia. En la OT es un medio opcional, útil sobre todo en ruralidad. Conviene decidir con datos si se mantiene para toda la red.",s:["FLU","ACT","OT §8.1"]},
+ {id:"G5",sev:"preventivo",t:"El aviso radial se define solo para establecimientos rurales y no tiene calendario",x:"La mesa está definiendo que el aviso radial se aplique a los establecimientos catalogados como rurales (Tabla N°2 de ruralidad). Falta un calendario de avisos para trabajar barridos trimestrales y decidir qué se hace en los establecimientos urbanos. Según el flujo, respondían solo Chaitén y Fresia. En la OT es un medio opcional, útil sobre todo en ruralidad.",s:["FLU","ACT","OT §8.1","RUR"]},
  {id:"G6",sev:"preventivo",t:"Visitas domiciliarias sin calendario ni acuerdo formal evidenciado",x:"Falta un calendario de visitas ligado a las aperturas de agenda, para que las personas encontradas puedan ser citadas. La OT exige acuerdos en red firmados por resoluciones locales que designen responsables, y un certificado de contacto. No encontré ese acuerdo en los documentos revisados.",s:["FLU","OT §8","OT §8.2"]},
  {id:"G7",sev:"continuidad",t:"El Centro de Contacto aparece como eliminado en el Acta",x:"El Acta del 05-08-2026 habla de los cambios organizacionales del Departamento de Procesos Ambulatorios de Especialidad y de la eliminación del Centro de Contacto existente. El Manual, aprobado el 20-05-2026, lo hace custodio del procedimiento. El carril «Contacto HPM» puede quedar sin titular. Hay que confirmar con A. Leiva y la Subdirección qué ocurre y quién asume las funciones.",s:["ACT","MAN","Res. J1907"]},
  {id:"G8",sev:"preventivo",t:"Vouchers tardíos, procesos manuales y sistemas sin integración",x:"El Acta señala demoras en registrar los respaldos administrativos, procesos manuales por falta de integración entre sistemas, duplicidad de trabajo y riesgo de inconsistencias. Los datos de contacto no tienen un mecanismo común de actualización entre establecimientos.",s:["ACT","OT §7"]},
@@ -473,7 +491,7 @@ var GAPS=[
  {id:"G15",sev:"fortaleza",t:"Navegadores ya usa campañas WhatsApp y tiene un estado «no contactado»",x:"Portal 0 para campañas automatizadas, acompañamiento activo y estados de caso. El protocolo trata «no contactado» como gestión activa y no como cierre.",s:["NAV","MIN"]},
  {id:"G16",sev:"fortaleza",t:"La UGT ya trabaja con un referente por territorio y una contraparte local",x:"Funciona hoy en la provincia de Palena, la comuna de Cochamó y algunas islas de Calbuco, con planillas compartidas. Es un modelo probado que se puede replicar para la contactabilidad.",s:["MIN","DIR"]},
  {id:"G17",sev:"aclarar",t:"Qué datos viajan en los avisos radiales y listados",x:"Los listados pasan al SSDR, a las OIRS y a una empresa licitada. La OT exige resguardar la información sensible en todos los medios y prohíbe usar redes sociales para respaldar egresos. Falta confirmar qué datos contienen los listados y los avisos, y quién los custodia.",s:["FLU","OT §7.3","OT §8"]},
- {id:"G18",sev:"aclarar",t:"Quién es el referente territorial HPM fuera de los territorios de la UGT",x:"La UGT cubre Palena, Cochamó y algunas islas de Calbuco. Para Los Muermos, Frutillar y el resto de la red no está definido quién cumple ese rol en el HPM. Con un solo referente por territorio también falta definir quién lo reemplaza.",s:["DIR","MIN"]},
+ {id:"G18",sev:"aclarar",t:"Cómo se reparte la cartera de establecimientos dentro del equipo del Centro de Contacto",x:"El Centro de Contacto es el equipo referente del hospital y cada establecimiento de origen tiene una contraparte. No está definido quién del equipo atiende a cuáles establecimientos ni quién lo reemplaza. La UGT cubre Palena, Cochamó y algunas islas de Calbuco y puede servir de modelo.",s:["DIR","MIN"]},
  {id:"G19",sev:"preventivo",t:"Un modelo por referentes depende de las personas",x:"Si la contraparte se cambia, se enferma o sale de vacaciones, el circuito se corta. Hacen falta un subrogante, un formato común de solicitud y devolución, un directorio vigente y un plazo de respuesta acordado. Además, el Servicio de Salud debe validar el modelo para que no se perciba como una imposición del HPM.",s:["PRO","ACT"]},
  {id:"G20",sev:"aclarar",t:"El proceso de contactabilidad en el origen no está documentado",x:"La OT cubre mediana y alta complejidad. Lo que hacen los centros de origen para que la persona llegue a su primera atención, y lo que registran antes de derivar, se ha supuesto y no se ha levantado. Conviene preguntarlo a APS antes de afirmar algo. Si la mesa decide partir desde la derivación, se omite con el selector de alcance.",s:["OT §3","DIR"]},
  {id:"G21",sev:"continuidad",t:"Después de la consulta nueva no hay una siguiente acción asegurada para todos",x:"La verificación de que existe un control, examen o contrarreferencia posterior se describe solo para las tres especialidades de Navegadores. Para el resto, el proceso de contactabilidad termina con la atención. Si nadie vigila el paso siguiente, la persona puede volver a quedar esperando.",s:["NAV","OT §5.5","MAN"]}
@@ -481,8 +499,8 @@ var GAPS=[
 
 var DECS=[
  "¿Quién designa a la contraparte de cada establecimiento: el SSDR o cada establecimiento? ¿Puede ser el SOME o debe ser otra función?",
- "¿Quién es el referente territorial HPM en los territorios donde no está la UGT?",
- "¿Quién subroga a cada referente y cómo se mantiene un directorio vigente?",
+ "¿Cómo se reparte la cartera de establecimientos entre las personas del equipo del Centro de Contacto?",
+ "¿Quién subroga a cada contraparte y a cada integrante del equipo, y cómo se mantiene un directorio vigente?",
  "¿Cuál es el evento formal que activa el subproceso de no contactabilidad?",
  "¿Qué resultados de contacto se registran y cómo se clasifican? (número equivocado, sin respuesta, mensaje no entregado, respuesta ambigua)",
  "¿Se alinea el Manual HPM con las 3 llamadas de la OT en días y horarios distintos?",
@@ -495,7 +513,9 @@ var DECS=[
  "¿Qué indicadores medirán si el modelo mejora la continuidad, y con qué línea de base?",
  "¿Qué ocurre con el Centro de Contacto y quién asume sus funciones?",
  "¿Desde qué punto parte el proceso que se estandariza: el centro de origen, la derivación o el hospital de especialidad?",
- "¿Quién responde por que exista una siguiente acción asistencial después de la CNE?"
+ "¿Quién responde por que exista una siguiente acción asistencial después de la CNE?",
+ "¿Qué establecimientos se catalogan como rurales para el aviso radial y qué se hace en los urbanos?",
+ "¿Cuál es el rol del SSDR en la propuesta: qué información recibe, con qué frecuencia y si conserva algún rol de apoyo?"
 ];
 
 /* ============ UTILIDADES ============ */
@@ -517,7 +537,7 @@ function tiles(){
     return '<div class="bar" role="img" aria-label="Distribución">'+parts.map(function(p){return '<i style="width:'+(p[0]*100/tot)+'%;background:'+p[1]+'"></i>';}).join("")+'</div>';}
   var h="";
   h+='<div class="tile"><h3>Actividades en la matriz</h3><div class="big">'+n+'</div><div class="sub">'+LAYERS[0].rows.length+' actores, '+COLS.length+' etapas</div></div>';
-  h+='<div class="tile"><h3>Por origen</h3><div class="big">'+t.N+' · '+t.P+' · '+t.X+'</div>'+bar([[t.N,"var(--t-norma)"],[t.P,"var(--t-practica)"],[t.X,"var(--t-propuesta)"]])+'<div class="sub">Norma · Práctica · Propuesta</div></div>';
+  h+='<div class="tile"><h3>Por tipo de contenido</h3><div class="big">'+t.N+' · '+t.P+' · '+t.X+'</div>'+bar([[t.N,"var(--t-norma)"],[t.P,"var(--t-practica)"],[t.X,"var(--t-propuesta)"]])+'<div class="sub">Norma · Práctica · Propuesta</div></div>';
   h+='<div class="tile"><h3>¿Existe hoy?</h3><div class="big">'+e.E+' · '+e.D+' · '+e.R+' · '+e.Q+'</div>'+bar([[e.E,"var(--e-existe)"],[e.D,"var(--e-nosabe)"],[e.R,"var(--e-noexiste)"],[e.Q,"var(--e-propuesta)"]])+'<div class="sub">Existe · No sabemos · No existe · Propuesta</div></div>';
   h+='<div class="tile"><h3>Brechas y alertas</h3><div class="big">'+GAPS.length+'</div>'+bar([[g.continuidad||0,"var(--g-continuidad)"],[g.preventivo||0,"var(--g-preventivo)"],[g.aclarar||0,"var(--g-aclarar)"],[g.fortaleza||0,"var(--g-fortaleza)"]])+'<div class="sub">'+(g.continuidad||0)+' de continuidad · '+(g.preventivo||0)+' preventivas · '+(g.aclarar||0)+' por aclarar · '+(g.fortaleza||0)+' fortalezas</div></div>';
   $("tiles").innerHTML=h;
@@ -528,17 +548,17 @@ var ROUTE_AS=[
  {w:"Contacto HPM",x:"Tres llamados sin respuesta o número equivocado. La persona queda «no contactado».",g:"La OT pide días y horarios distintos."},
  {w:"Registro y Contacto HPM",x:"Informan a SSDR el listado de no contactables, una vez al mes antes de la apertura de agenda.",g:"Sin formato ni plazo de respuesta acordados."},
  {w:"SSDR",x:"Busca datos en RAYEN y Expertos. Si hay dato nuevo, el Contacto HPM cita.",g:""},
- {w:"SSDR y OIRS",x:"Aviso radial con empresa licitada. La respuesta llega por OIRS o línea 600.",g:"Sin calendario. Medio opcional en la OT."},
- {w:"SSDR",x:"Visita domiciliaria a quienes no respondieron. Si hay contacto, formulario y cita.",g:"La OT pide certificado de contacto y acuerdo en red."},
+ {w:"SSDR y OIRS",x:"Aviso radial con empresa licitada. La respuesta llega por OIRS o línea 600.",g:"Sin calendario. La mesa define aplicarlo en establecimientos rurales."},
+ {w:"SSDR",x:"Visita domiciliaria a quienes no respondieron. Si hay contacto, se entrega la cita ya asignada y se actualizan los datos.",g:"La OT pide certificado de contacto y acuerdo en red."},
  {w:"Registro HPM",x:"Si no se ubica en el domicilio: egreso en SIGTE por causal 11.",g:"No se ve el aviso de plazo de 30 días a la persona."}
 ];
 var ROUTE_TO=[
- {w:"Contacto HPM",x:"Agota los intentos exigidos, registra cada uno y clasifica el resultado.",g:""},
- {w:"Referente territorial HPM",x:"Recibe el caso de su territorio y lo deriva con ficha mínima a su contraparte.",g:""},
- {w:"Contraparte del establecimiento",x:"Busca con medios locales (SOME, equipo de sector, OIRS). Devuelve resultado estandarizado en el plazo acordado.",g:""},
- {w:"SSDR",x:"Si la búsqueda local no basta, consulta RAYEN, Expertos y la API de Contactabilidad.",g:""},
- {w:"SSDR con el referente",x:"Medios de mayor costo, aviso radial y visita domiciliaria, según COVICOM, GES y capacidad.",g:""},
- {w:"Referente y Registro HPM",x:"Vínculo recuperado: el Contacto HPM cita. Si persiste: resolución con verificables o caso vigente.",g:""}
+ {w:"Centro de Contacto HPM",x:"Agota los intentos exigidos, registra cada uno y clasifica el resultado.",g:""},
+ {w:"Centro de Contacto y contraparte",x:"El equipo se comunica directamente con la contraparte del establecimiento de origen y le deriva el caso con ficha mínima.",g:""},
+ {w:"Contraparte del establecimiento",x:"Busca con medios locales (SOME, equipo de sector, OIRS). Devuelve un resultado estandarizado en el plazo acordado.",g:""},
+ {w:"Centro de Contacto HPM",x:"Si la búsqueda local no basta, consulta RAYEN, Expertos y la API de Contactabilidad, con los perfiles que se habiliten a los referentes.",g:""},
+ {w:"Establecimiento, con el Centro de Contacto",x:"Medios de mayor costo según COVICOM, GES y capacidad: aviso radial en establecimientos rurales (en definición) y visita domiciliaria.",g:""},
+ {w:"Centro de Contacto y Registro HPM",x:"Vínculo recuperado: se cita. Si persiste: resolución con verificables o caso vigente. El SSDR (su referente y el equipo dedicado) recibe la información para su conocimiento.",g:""}
 ];
 function routes(){
   function strip(title,note,arr,cls){
@@ -551,7 +571,7 @@ function routes(){
   }
   $("routes").innerHTML=
    strip("Ruta actual HPM–SSDR","Fuente: flujo de contactabilidad HPM–SSDR y Manual HPM. En naranja, lo que falta frente a la OT.",ROUTE_AS,"as")+
-   strip("Ruta propuesta por referentes","Propuesta para validar. Replica el trabajo de la UGT con un referente por territorio y una contraparte en cada establecimiento.",ROUTE_TO,"to");
+   strip("Ruta propuesta por el Centro de Contacto y sus contrapartes","Propuesta para validar. El Centro de Contacto HPM es el equipo referente y se comunica con la contraparte de cada establecimiento de origen. El SSDR se mantiene informado.",ROUTE_TO,"to");
 }
 
 
@@ -620,7 +640,7 @@ function openCell(i){
   $("ficha-t").textContent=r.t+" · "+COLS[c.c].t;
   var h='';
   h+='<div><div class="k">Actividad</div><div class="v">'+esc(c.x)+'</div></div>';
-  h+='<div class="row2"><div><div class="k">Origen</div><div class="v">'+TIPO[c.t]+'</div></div><div><div class="k">¿Existe hoy?</div><div class="v"><span class="badge '+ESTCLS[c.e]+' e-'+c.e+'">'+EST[c.e]+'</span></div></div></div>';
+  h+='<div class="row2"><div><div class="k">Tipo de contenido</div><div class="v">'+TIPO[c.t]+'</div></div><div><div class="k">¿Existe hoy?</div><div class="v"><span class="badge '+ESTCLS[c.e]+' e-'+c.e+'">'+EST[c.e]+'</span></div></div></div>';
   h+='<div class="row2"><div><div class="k">Carril</div><div class="v">'+esc(r.t)+'</div></div><div><div class="k">Etapa</div><div class="v">'+COLS[c.c].c+' · '+esc(COLS[c.c].t)+'</div></div></div>';
   c.d.forEach(function(d){h+='<div class="dl"><div class="k">'+esc(d[0])+'</div><div class="v">'+esc(d[1])+'</div></div>';});
   h+='<div><div class="k">Fuentes</div>'+c.s.map(function(s){return '<div class="v src">'+esc(srcLabel(s))+'</div>';}).join("")+'</div>';
@@ -643,18 +663,19 @@ function gaps(){
   if(mode==="sev")list.sort(function(a,b){return SEVORD[a.sev]-SEVORD[b.sev]||parseInt(a.id.slice(1))-parseInt(b.id.slice(1));});
   if(mode==="etapa")list.sort(function(a,b){return firstCol(a)-firstCol(b);});
   if(mode==="actor")list.sort(function(a,b){return firstRow(a)-firstRow(b);});
+  $("gcount").textContent="("+GAPS.length+")";
   $("gaps").innerHTML=list.map(function(g){
     var cs=gapCells(g.id);
-    return '<article class="gap-card" style="--gc:'+sevColor(g.sev)+'"><div class="gh"><span class="gs">'+SEV[g.sev]+'</span><span class="gid">'+g.id+'</span></div>'
-     +'<h3>'+esc(g.t)+'</h3><p>'+esc(g.x)+'</p>'
-     +'<div class="src">'+g.s.map(function(s){return esc(s);}).join(" · ")+'</div>'
+    return '<details class="gap-card" style="--gc:'+sevColor(g.sev)+'"><summary><div class="gh"><span class="gs">'+SEV[g.sev]+'</span><span class="gid">'+g.id+'</span></div><h3>'+esc(g.t)+'</h3></summary>'
+     +'<div class="gbody"><p>'+esc(g.x)+'</p>'
+     +'<div class="src">'+g.s.map(function(x){return esc(srcLabel(x));}).join(" · ")+'</div>'
      +(cs.length?'<div class="links">'+cs.map(function(c){return '<button type="button" class="lk" data-go="'+c.i+'">'+COLS[c.c].c+' · '+esc(rowIndex[c.r].t.split(" ").slice(0,3).join(" "))+'</button>';}).join("")+'</div>':'')
-     +'</article>';
+     +'</div></details>';
   }).join("");
 }
 
 /* ============ OTROS BLOQUES ============ */
-function decs(){$("decs").innerHTML=DECS.map(function(d){return '<li>'+esc(d)+'</li>';}).join("");}
+function decs(){$("dcount").textContent="("+DECS.length+")";$("decs").innerHTML=DECS.map(function(d){return '<li>'+esc(d)+'</li>';}).join("");}
 function srcs(){$("srcs").innerHTML=Object.keys(SRC).map(function(k){return '<div><b>'+k+'</b>'+esc(SRC[k])+'</div>';}).join("");}
 
 /* ============ EVENTOS ============ */
@@ -669,6 +690,8 @@ function bind(){
   $("f-g").addEventListener("change",function(){F.g=this.checked;matrix();});
   $("f-clear").addEventListener("click",function(){F={tipo:"todos",est:"todos",q:"",g:false};$("f-tipo").value="todos";$("f-est").value="todos";$("f-q").value="";$("f-g").checked=false;matrix();});
   $("g-sort").addEventListener("change",gaps);
+  $("g-open").addEventListener("click",function(){document.querySelectorAll("#gaps details").forEach(function(d){d.open=true;});});
+  $("g-close").addEventListener("click",function(){document.querySelectorAll("#gaps details").forEach(function(d){d.open=false;});});
   $("f-scope").addEventListener("change",function(){SCOPE=this.value;journey();matrix();});
   $("journey").addEventListener("click",function(e){var b=e.target.closest("[data-col]");if(!b)return;var el=$("colh-"+b.getAttribute("data-col"));if(el){el.scrollIntoView({block:"nearest",inline:"center"});$("matriz-sec").scrollIntoView({block:"start"});}});
   $("gaps").addEventListener("click",function(e){
